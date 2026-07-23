@@ -59,6 +59,11 @@
 <!--            <groupId>org.springframework.ai</groupId>-->
 <!--            <artifactId>spring-ai-openai-spring-boot-starter</artifactId>-->
 <!--        </dependency>-->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
     </dependencies>
     <!-- Maven Central 直连，绕过 alimaven 镜像（阿里云未同步 Spring AI 1.0.3） -->
     <repositories>

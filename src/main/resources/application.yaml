@@ -14,10 +14,13 @@ spring:
       chat:
         options:
           # 中转平台对应的模型名称，和你之前 curl 用的保持一致
-          model: qwen3.7-plus
+          model: deepseek-v4-flash
           # 默认温度参数，可在代码中动态覆盖。用于控制输出随机性，取值 0-1。值越低输出越稳定、确定性越强；值越高越发散、创造性越强。代码生成、信息提取类场景建议 0.1-0.3；创作类场景建议 0.7-0.9。
           temperature: 0.7
           # 默认关闭流式输出，一次性返回结果
           stream: true
+          # 关键：关闭 qwen3 的思考模式，直接输出 content
+          extra-body-parameters:
+            enable_thinking: false
 
 #        path: /chat/completions  # 自定义接口路径.确认中转平台的接口路径是否符合 OpenAI 规范，极少数中转不带 /v1，需要额外配置

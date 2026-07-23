@@ -8,6 +8,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
-@RequestMapping("/api/chat")
+@RequestMapping("/chat")
 public class ChatController {
     private final ChatClient chatClient;
     @Autowired
@@ -58,7 +59,8 @@ public class ChatController {
      * 流式输出接口（1.x 版本写法）
      * 这个我们 Day10 才学，今天不用急
      */
-    @GetMapping(value = "/chat/stream", produces = "text/event-stream")
+//    @GetMapping(value = "/chat/stream", produces = "text/event-stream")
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chatStream(@RequestParam String message) {
         return chatClient.prompt()
                 .user(message)
@@ -66,7 +68,7 @@ public class ChatController {
                 .content();
     }
 
-    @GetMapping("/chat/translator")
+    @GetMapping("/translator")
     public String translate(@RequestParam String text) {
         return chatClient.prompt()
                 .system("你是一个专业翻译官，把所有输入翻译成英文")
