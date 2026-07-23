@@ -2,6 +2,7 @@ package com.example.springai.controller;
 
 
 import com.example.springai.common.ChatSession;
+import com.example.springai.pojo.User;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -10,7 +11,10 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.ai.converter.ListOutputConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -136,5 +140,99 @@ public class ChatController {
                 .user(promptText)
                 .stream()
                 .content();
+    }
+    /**
+     * 用户信息提取接口
+     * 输入一段描述文本，自动提取成结构化的 User 对象
+     */
+    @GetMapping("/extract/user")
+    public User extractUser(@RequestParam String text) {
+        // 1. 创建转换器，指定目标类型
+        BeanOutputConverter<User> converter = new BeanOutputConverter<>(User.class);
+
+        // 2. 构建提示词模板
+        String template = """
+            从下面的文本中提取用户信息。
+            
+            文本内容：
+            {text}
+            
+            {format}
+            
+            注意：只返回JSON格式，不要任何解释文字、不要markdown标记、不要代码块。
+            """;
+
+        PromptTemplate promptTemplate = new PromptTemplate(template);
+        Prompt prompt = promptTemplate.create(Map.of(
+                "text", text,
+                "format", converter.getFormat()  // 自动注入格式要求
+        ));
+
+        // 3. 调用大模型
+        String jsonResponse = chatClient.prompt(prompt)
+                .call()
+                .content();
+
+        // 4. 把 JSON 转成 User 对象
+        User user = converter.convert(jsonResponse);
+
+        System.out.println("提取结果：" + user);
+        return user;
+    }
+
+    /**
+     * 提取关键词列表
+     */
+    @GetMapping("/extract/keywords")
+    public List<String> extractKeywords(@RequestParam String text) {
+        ListOutputConverter converter = new ListOutputConverter(new DefaultConversionService());
+
+
+        String template = """
+            从下面文本中提取5个核心关键词，用逗号分隔。
+            
+            文本：{text}
+            
+            {format}
+            """;
+
+        PromptTemplate promptTemplate = new PromptTemplate(template);
+        Prompt prompt = promptTemplate.create(Map.of(
+                "text", text,
+                "format", converter.getFormat()
+        ));
+
+        String response = chatClient.prompt(prompt).call().content();
+        return converter.convert(response);
+    }
+
+
+    @GetMapping("/extract/user-safe")
+    public User extractUserSafe(@RequestParam String text) {
+        try {
+            BeanOutputConverter<User> converter = new BeanOutputConverter<>(User.class);
+
+            String template = """
+                从文本中提取用户信息，只返回纯JSON，不要任何其他内容。
+                文本：{text}
+                {format}
+                """;
+
+            PromptTemplate promptTemplate = new PromptTemplate(template);
+            Prompt prompt = promptTemplate.create(Map.of("text", text, "format", converter.getFormat()));
+
+            String jsonResponse = chatClient.prompt(prompt).call().content();
+
+            // 清理可能的 markdown 标记（比如模型返回了 ```json ... ```）
+            jsonResponse = jsonResponse.replaceAll("```json", "")
+                    .replaceAll("```", "")
+                    .trim();
+
+            return converter.convert(jsonResponse);
+        } catch (Exception e) {
+            System.out.println("解析失败：" + e.getMessage());
+            // 返回空对象或默认值，不崩溃
+            return new User();
+        }
     }
 }

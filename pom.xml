@@ -64,6 +64,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <!-- Maven Central 直连，绕过 alimaven 镜像（阿里云未同步 Spring AI 1.0.3） -->
     <repositories>
