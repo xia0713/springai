@@ -21,18 +21,19 @@
 <!--        <spring-ai.version>1.0.3</spring-ai.version>-->
     </properties>
 
-    <!-- 统一版本管理：必须放在dependencies之前 -->
+    <!-- 1. Spring AI 父依赖管理 -->
 <!--    <dependencyManagement>-->
 <!--        <dependencies>-->
 <!--            <dependency>-->
 <!--                <groupId>org.springframework.ai</groupId>-->
 <!--                <artifactId>spring-ai-bom</artifactId>-->
-<!--                <version>${spring-ai.version}</version>-->
+<!--                <version>2.0.0</version>-->
 <!--                <type>pom</type>-->
 <!--                <scope>import</scope>-->
 <!--            </dependency>-->
 <!--        </dependencies>-->
 <!--    </dependencyManagement>-->
+
 
     <dependencies>
         <!-- Web 启动器：提供REST接口能力 -->
@@ -54,7 +55,10 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-openai-spring-boot-starter</artifactId>-->
+<!--        </dependency>-->
     </dependencies>
     <!-- Maven Central 直连，绕过 alimaven 镜像（阿里云未同步 Spring AI 1.0.3） -->
     <repositories>
@@ -63,6 +67,15 @@
             <name>Maven Central for Spring AI</name>
             <url>https://repo1.maven.org/maven2/</url>
         </repository>
+
+<!--        <repository>-->
+<!--            <id>spring-milestones</id>-->
+<!--            <name>Spring Milestones</name>-->
+<!--            <url>https://repo.spring.io/milestone</url>-->
+<!--            <snapshots>-->
+<!--                <enabled>false</enabled>-->
+<!--            </snapshots>-->
+<!--        </repository>-->
     </repositories>
     <build>
         <plugins>

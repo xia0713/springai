@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -52,15 +53,25 @@ public class ChatController {
         return chatModel.call(prompt);
     }
 
+
     /**
-     * 异步调用（不阻塞主线程）
+     * 流式输出接口（1.x 版本写法）
+     * 这个我们 Day10 才学，今天不用急
      */
-//    @GetMapping("/chat/async")
-//    public CompletableFuture<String> chatAsync(@RequestParam String message) {
-//        return chatClient.prompt()
-//                .user(message)
-//                .call()
-//                .entity(String.class)
-//                .toFuture();
-//    }
+    @GetMapping(value = "/chat/stream", produces = "text/event-stream")
+    public Flux<String> chatStream(@RequestParam String message) {
+        return chatClient.prompt()
+                .user(message)
+                .stream()
+                .content();
+    }
+
+    @GetMapping("/chat/translator")
+    public String translate(@RequestParam String text) {
+        return chatClient.prompt()
+                .system("你是一个专业翻译官，把所有输入翻译成英文")
+                .user(text)
+                .call()
+                .content();
+    }
 }
