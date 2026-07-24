@@ -1,8 +1,8 @@
 package com.example.springai.controller;
 
-
 import com.example.springai.common.ChatSession;
 import com.example.springai.pojo.User;
+import com.example.springai.util.AiUtil;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
@@ -15,6 +15,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.ListOutputConverter;
+import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.http.MediaType;
@@ -28,6 +29,8 @@ import reactor.core.publisher.Flux;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import org.springframework.ai.embedding.EmbeddingModel;
+
 
 @RestController
 @RequestMapping("/chat")
@@ -36,11 +39,13 @@ public class ChatController {
     private ChatModel chatModel;
     private final ChatClient chatClient;
     private final ChatSession chatSession;
+    private final EmbeddingModel embeddingModel;
 
     // 构造注入
-    public ChatController(ChatClient.Builder builder, ChatSession chatSession) {
+    public ChatController(ChatClient.Builder builder, ChatSession chatSession, EmbeddingModel embeddingModel) {
         this.chatClient = builder.build();
         this.chatSession = chatSession;
+        this.embeddingModel = embeddingModel;
     }
 
 
@@ -300,10 +305,61 @@ public class ChatController {
     @GetMapping("/provider")
     public String chatByProvider(@RequestParam String message,
                                  @RequestParam(defaultValue = "deepseek") String provider) {
-        return switch (provider) {
-            case "deepseek" -> deepseekChatClient.prompt().user(message).call().content();
-            case "qwen" -> qwenClient.prompt().user(message).call().content();
-            default -> throw new IllegalArgumentException("不支持的模型厂商：" + provider);
-        };
+        if ("deepseek".equals(provider)) {
+            return deepseekChatClient.prompt().user(message).call().content();
+        } else if ("qwen".equals(provider)) {
+            return qwenClient.prompt().user(message).call().content();
+        }
+        throw new IllegalArgumentException("不支持的模型厂商：" + provider);
     }
+
+
+    /**
+     * 获取文本的向量
+     */
+    @GetMapping("/embedding")
+    public Map<String, Object> getEmbedding(@RequestParam String text) {
+        EmbeddingResponse response = embeddingModel.embedForResponse(List.of(text));
+
+        float[] vector = response.getResults().get(0).getOutput();
+
+        return Map.of(
+                "text", text,
+                "vectorDimension", vector.length,  // 向量维度
+                "first10Values", AiUtil.first10(vector)   // 只展示前10个数字，太长了
+        );
+    }
+
+    /**
+     * 计算两段文本的相似度
+     * @param text1
+     * @param text2
+     * @return
+     */
+
+    @GetMapping("/embedding/similarity")
+    public Map<String, Object> calculateSimilarity(
+            @RequestParam String text1,
+            @RequestParam String text2) {
+
+        // 分别获取两个文本的向量
+        EmbeddingResponse resp1 = embeddingModel.embedForResponse(List.of(text1));
+        EmbeddingResponse resp2 = embeddingModel.embedForResponse(List.of(text2));
+
+        float[] vec1 = resp1.getResults().get(0).getOutput();
+        float[] vec2 = resp2.getResults().get(0).getOutput();
+
+        // 计算余弦相似度
+        double similarity = AiUtil.cosineSimilarity(vec1, vec2);
+
+        return Map.of(
+                "text1", text1,
+                "text2", text2,
+                "similarity", String.format("%.4f", similarity),
+                "dimension", vec1.length
+        );
+    }
+
+
+
 }
