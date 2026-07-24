@@ -17,6 +17,8 @@ spring:
           model: deepseek-v4-flash
           # 默认温度参数，可在代码中动态覆盖。用于控制输出随机性，取值 0-1。值越低输出越稳定、确定性越强；值越高越发散、创造性越强。代码生成、信息提取类场景建议 0.1-0.3；创作类场景建议 0.7-0.9。
           temperature: 0.7
+          # 默认最大输出 Token
+          max-tokens: 2000
           # 默认关闭流式输出，一次性返回结果
           stream: true
           # 关键：关闭 qwen3 的思考模式，直接输出 content
@@ -24,3 +26,8 @@ spring:
             enable_thinking: false
 
 #        path: /chat/completions  # 自定义接口路径.确认中转平台的接口路径是否符合 OpenAI 规范，极少数中转不带 /v1，需要额外配置
+# 自定义配置（可选）
+app:
+  chat:
+    # 系统提示词
+    system-prompt: 你是一个专业的Java开发助手，回答简洁准确，多用代码示例
