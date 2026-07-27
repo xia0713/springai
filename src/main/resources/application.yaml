@@ -5,6 +5,11 @@ spring:
   application:
     name: SpringAI
 
+  servlet:
+    multipart:
+      max-file-size: 10MB              # 允许上传较大图片
+      max-request-size: 10MB
+
   datasource:
     url: jdbc:postgresql://localhost:5432/ai_db
     username: postgres
