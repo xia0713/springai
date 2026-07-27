@@ -14,6 +14,11 @@ import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
@@ -38,7 +43,10 @@ public class ImageUnderstandingService {
 
         MimeType mimeType = getMimeType(file);
 
-        Resource imageData = new ByteArrayResource(file.getBytes());
+        // 压缩大图片，避免 base64 过大导致请求超时
+        byte[] imageBytes = compressIfNeeded(file.getBytes());
+
+        Resource imageData = new ByteArrayResource(imageBytes);
         return chatClient.prompt()
                 .user(u -> u.text(prompt)
                         .media(mimeType, imageData))
@@ -77,8 +85,8 @@ public class ImageUnderstandingService {
         MimeType type1 = getMimeType(file1);
         MimeType type2 = getMimeType(file2);
 
-        Resource data1 = new ByteArrayResource(file1.getBytes());
-        Resource data2 = new ByteArrayResource(file2.getBytes());
+        Resource data1 = new ByteArrayResource(compressIfNeeded(file1.getBytes()));
+        Resource data2 = new ByteArrayResource(compressIfNeeded(file2.getBytes()));
 
         return chatClient.prompt()
                 .user(u -> u.text(prompt)
@@ -110,5 +118,34 @@ public class ImageUnderstandingService {
             if (lower.endsWith(".txt")) return MimeTypeUtils.parseMimeType("text/plain");
         }
         return MimeTypeUtils.IMAGE_PNG; // 兜底
+    }
+
+    /**
+     * 大图压缩：超过 1MB 的图片缩放到 1024px 宽，控制 base64 体积避免请求超时
+     */
+    private byte[] compressIfNeeded(byte[] imageBytes) throws IOException {
+        if (imageBytes.length <= 1024 * 1024) {
+            return imageBytes; // 小图不压缩
+        }
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes);
+        BufferedImage original = ImageIO.read(bis);
+
+        if (original == null) {
+            return imageBytes; // 不是图片格式，原样返回
+        }
+
+        int width = Math.min(original.getWidth(), 1024);
+        int height = original.getHeight() * width / original.getWidth();
+
+        BufferedImage scaled = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = scaled.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.drawImage(original, 0, 0, width, height, null);
+        g.dispose();
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ImageIO.write(scaled, "jpg", bos);
+        return bos.toByteArray();
     }
 }

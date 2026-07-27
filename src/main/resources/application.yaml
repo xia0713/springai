@@ -30,16 +30,14 @@ spring:
 
     openai:
       # 第三方中转平台基础地址，只写到域名/端口，Spring AI 自动拼接 /v1/chat/completions
-#      base-url: https://ai-gateway.ztn.cn
-      base-url: https://www.micuapi.ai
+      base-url: https://ai-gateway.ztn.cn
       # 中转平台分配的 API 密钥，严禁写在代码中
-      api-key: sk-LQKMaAjMTlyRxutKOHMC7OF0e3CoXfog46V1hxmRYq7z1xWw
-#      api-key: sk-RtUONsbppcygBmXyRI56E1evZVh9sqhAwYtphlK0Jxjey2tv
+      api-key: sk-RtUONsbppcygBmXyRI56E1evZVh9sqhAwYtphlK0Jxjey2tv
       chat:
         options:
           # 中转平台对应的模型名称，和你之前 curl 用的保持一致
-          model: gemini-2.0-flash-001
-          # 默认温度参数，可在代码中动态覆盖。用于控制输出随机性，取值 0-1。值越低输出越稳定、确定性越强；值越高越发散、创造性越强。代码生成、信息提取类场景建议 0.1-0.3；创作类场景建议 0.7-0.9。
+          model: qwen3.7-plus
+          # 默认温度参数，可在代码中动态覆盖。用于控制输出随机性,取值 0-1。值越低输出越稳定、确定性越强；值越高越发散、创造性越强。代码生成、信息提取类场景建议 0.1-0.3；创作类场景建议 0.7-0.9。
           temperature: 0.7
           # 默认最大输出 Token
           max-tokens: 2000
@@ -50,8 +48,9 @@ spring:
             enable_thinking: false
 
       embedding:
-        options:
-          model: gemini-embedding-001
+#        options:
+#          model: gemini-embedding-001
+        enabled: false  # 手动 EmbeddingConfig 提供 bean，禁用自动配置避免冲突
 
 #        path: /chat/completions  # 自定义接口路径.确认中转平台的接口路径是否符合 OpenAI 规范，极少数中转不带 /v1，需要额外配置
 # 自定义配置（可选）
