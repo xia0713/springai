@@ -5,7 +5,24 @@ spring:
   application:
     name: SpringAI
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ai_db
+    username: postgres
+    password: xia0713
+    driver-class-name: org.postgresql.Driver
+
   ai:
+    # 向量存储配置
+    vectorstore:
+      pgvector:
+        table-name: vector_store  # 表名,默认表名 vector_store
+        dimensions: 3072          # ⚠️ 必须和你的 Embedding 模型维度一致,向量维度（不填则自动从 EmbeddingModel 获取）
+        index-type: none           # 3072 维超过 pgvector HNSW/IVFFlat 的 2000 维上限，暂不建索引
+        initialize-schema: true     # 【关键！】启动时自动建表建索引
+        distance-type: COSINE_DISTANCE  # 距离度量，默认余弦距离
+          # schema-name: public       # 默认 public
+        max-document-batch-size: 10000  # 单批次最大文档数
+
     openai:
       # 第三方中转平台基础地址，只写到域名/端口，Spring AI 自动拼接 /v1/chat/completions
 #      base-url: https://ai-gateway.ztn.cn
