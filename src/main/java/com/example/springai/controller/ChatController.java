@@ -1,7 +1,9 @@
 package com.example.springai.controller;
 
 import com.example.springai.common.ChatSession;
+import com.example.springai.dto.ChatRequest;
 import com.example.springai.pojo.User;
+import com.example.springai.service.ChatService;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
@@ -17,10 +19,7 @@ import org.springframework.ai.converter.ListOutputConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
@@ -37,9 +36,11 @@ public class ChatController {
     private final ChatClient chatClient;
     private final ChatSession chatSession;
 
-    public ChatController(ChatClient.Builder builder, ChatSession chatSession) {
+    private final ChatService chatService;
+    public ChatController(ChatClient.Builder builder, ChatSession chatSession, ChatService chatService) {
         this.chatClient = builder.build();
         this.chatSession = chatSession;
+        this.chatService = chatService;
     }
 
 
@@ -111,7 +112,40 @@ public class ChatController {
 
         return response;
     }
+    /**
+     * 同步聊天
+     * POST /api/chat
+     * {"sessionId": "user-001", "message": "你好"}
+     */
+    @PostMapping
+    public Map<String, String> chat(@RequestBody ChatRequest request) {
+        String response = chatService.chat(request);
+        return Map.of("response", response);
+    }
 
+    /**
+     * 流式聊天（SSE）
+     * GET /api/chat/stream?sessionId=user-001&message=你好
+     */
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> streamChat(
+            @RequestParam String sessionId,
+            @RequestParam String message) {
+        ChatRequest request = new ChatRequest();
+        request.setSessionId(sessionId);
+        request.setMessage(message);
+        return chatService.streamChat(request);
+    }
+
+    /**
+     * 清空对话历史
+     * DELETE /api/chat/history/{sessionId}
+     */
+    @DeleteMapping("/history/{sessionId}")
+    public Map<String, String> clearHistory(@PathVariable String sessionId) {
+        chatService.clearHistory(sessionId);
+        return Map.of("message", "对话历史已清空");
+    }
     /**
      * 清空对话历史,重新开始
      */

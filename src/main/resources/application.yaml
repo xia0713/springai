@@ -58,3 +58,9 @@ app:
   chat:
     # 系统提示词
     system-prompt: 你是一个专业的Java开发助手，回答简洁准确，多用代码示例
+
+# ========== 日志配置 ==========
+logging:
+  level:
+    org.springframework.ai: DEBUG
+    com.example.aiscaffold: DEBUG
