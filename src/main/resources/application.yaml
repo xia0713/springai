@@ -58,6 +58,14 @@ app:
   chat:
     # 系统提示词
     system-prompt: 你是一个专业的Java开发助手，回答简洁准确，多用代码示例
+  # 多模型网关配置（MultiModelConfig 使用）
+  gateway:
+    base-url: https://ai-gateway.ztn.cn
+    api-key: sk-RtUONsbppcygBmXyRI56E1evZVh9sqhAwYtphlK0Jxjey2tv
+  # Embedding 专属网关（ztn 不支持 embedding，走 micuapi.ai）
+  embedding:
+    base-url: https://www.micuapi.ai
+    api-key: sk-LQKMaAjMTlyRxutKOHMC7OF0e3CoXfog46V1hxmRYq7z1xWw
 
 # ========== 日志配置 ==========
 logging:

@@ -1,14 +1,10 @@
 package com.example.springai.controller;
 
-import com.example.springai.common.ChatSession;
 import com.example.springai.dto.ChatRequest;
 import com.example.springai.pojo.User;
 import com.example.springai.service.ChatService;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -20,12 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 
 @RestController
@@ -34,94 +28,23 @@ public class ChatController {
     @Autowired
     private ChatModel chatModel;
     private final ChatClient chatClient;
-    private final ChatSession chatSession;
 
     private final ChatService chatService;
-    public ChatController(ChatClient.Builder builder, ChatSession chatSession, ChatService chatService) {
+    public ChatController(ChatClient.Builder builder, ChatService chatService) {
         this.chatClient = builder.build();
-        this.chatSession = chatSession;
         this.chatService = chatService;
     }
 
 
+    /**
+     * 最简单聊天:直接传字符串
+     * GET /chat/simple?prompt=你好
+     */
     @GetMapping("/simple")
     public String simpleChat(@RequestParam String prompt) {
-        chatClient.prompt()
-                .user(prompt)
-                .call()
-                .content();
-        // 1. 最简单:直接传字符串
-        String reply = chatModel.call(prompt);
-
-// 2. 需要系统提示词 + 用户消息
-        ChatResponse response = chatModel.call(new Prompt(List.of(
-                new SystemMessage("你是翻译助手"),
-                new UserMessage("把hello翻译成中文")
-        )));
-        String text = response.getResult().getOutput().getText();
-
-// 3. 流式输出
-        Disposable subscribe = chatModel.stream("写一首诗")
-                .doOnNext(chunk -> System.out.print(chunk))
-                .subscribe();
-
-
         return chatModel.call(prompt);
     }
 
-
-    /**
-     * 流式输出接口（1.x 版本写法）
-     * 这个我们 Day10 才学,今天不用急
-     */
-//    @GetMapping(value = "/chat/stream", produces = "text/event-stream")
-    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> chatStream(@RequestParam String message) {
-        return chatClient.prompt()
-                .user(message)
-                .stream()
-                .content();
-    }
-
-    @GetMapping("/translator")
-    public String translate(@RequestParam String text) {
-        return chatClient.prompt()
-                .system("你是一个专业翻译官,把所有输入翻译成英文")
-                .user(text)
-                .call()
-                .content();
-    }
-
-    /**
-     * 多轮对话接口
-     * 连续提问,模型能记住上下文
-     */
-    @GetMapping("/multi-turn")
-    public String chatMultiTurn(@RequestParam String message) {
-        // 1. 把用户问题加入历史,拿到完整历史列表
-        List<Message> history = chatSession.addUserMessage(message);
-
-        // 2. 带着历史调用大模型
-        String response = chatClient.prompt()
-                .messages(history)  // 关键:传入完整对话历史
-                .call()
-                .content();
-
-        // 3. 把模型回答也加入历史
-        chatSession.addAssistantMessage(response);
-
-        return response;
-    }
-    /**
-     * 同步聊天
-     * POST /api/chat
-     * {"sessionId": "user-001", "message": "你好"}
-     */
-    @PostMapping
-    public Map<String, String> chat(@RequestBody ChatRequest request) {
-        String response = chatService.chat(request);
-        return Map.of("response", response);
-    }
 
     /**
      * 流式聊天（SSE）
@@ -138,20 +61,23 @@ public class ChatController {
     }
 
     /**
-     * 清空对话历史
-     * DELETE /api/chat/history/{sessionId}
+     * 多轮对话接口（无会话 id 版本，固定会话名）
+     * 连续提问,模型能记住上下文
      */
-    @DeleteMapping("/history/{sessionId}")
-    public Map<String, String> clearHistory(@PathVariable String sessionId) {
-        chatService.clearHistory(sessionId);
-        return Map.of("message", "对话历史已清空");
+    @GetMapping("/multi-turn")
+    public String chatMultiTurn(@RequestParam String message) {
+        ChatRequest request = new ChatRequest();
+        request.setSessionId("default-session");
+        request.setMessage(message);
+        return chatService.chat(request);
     }
+
     /**
      * 清空对话历史,重新开始
      */
     @GetMapping("/clear")
     public String clearChat() {
-        chatSession.clear();
+        chatService.clearHistory("default-session");
         return "对话已清空,可以重新开始";
     }
 
