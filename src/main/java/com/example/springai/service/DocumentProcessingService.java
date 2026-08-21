@@ -1,6 +1,13 @@
 package com.example.springai.service;
 
 import com.example.springai.config.TextCleanTransformer;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
@@ -11,14 +18,18 @@ import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class DocumentProcessingService {
 
     private final TextCleanTransformer textCleanTransformer;
+
+    private final ChatClient chatClient;
 
     private final VectorStore vectorStore;
 
@@ -29,10 +40,6 @@ public class DocumentProcessingService {
             .withKeepSeparator(true)
             .build();
 
-    public DocumentProcessingService(TextCleanTransformer textCleanTransformer, VectorStore vectorStore) {
-        this.textCleanTransformer = textCleanTransformer;
-        this.vectorStore = vectorStore;
-    }
 
     /**
      * 处理上传的文档：解析 → 清洗 → 分块
@@ -89,5 +96,74 @@ public class DocumentProcessingService {
                 .replaceAll("\\n{3,}", "\n\n")
                 .trim();
         return new Document(text, doc.getMetadata());
+    }
+
+    public Flux<String> streamsearch1(String query) {
+
+        List<Document> results = vectorStore.similaritySearch(
+                SearchRequest.builder()
+                        .query(query)
+                        .topK(3)
+                        .similarityThreshold(0.6)              // 相似度阈值，低于此值不返回（默认 0.0，即全部返回）
+                        .build()
+        );
+
+
+        List<Message> history = results.stream().<Message>map(document -> new AssistantMessage(document.getText())).toList();
+
+        return chatClient.prompt()
+                .system("你是一个客服，根据检索到的内容，回答用户的问题")
+                .messages(history)
+                .stream()
+                .content();
+    }
+
+    public String streamsearch(String query) {
+
+        List<Document> docs = vectorStore.similaritySearch(
+                SearchRequest.builder()
+                        .query(query)
+                        .topK(3)
+                        .similarityThreshold(0.6)              // 相似度阈值，低于此值不返回（默认 0.0，即全部返回）
+                        .build()
+        );
+
+
+        // ② 空检索直接拒答（Day 24 学的防幻觉）
+        if (docs.isEmpty()) {
+            return "抱歉，知识库中暂未收录该问题。";
+        }
+
+        // ③ 拼接上下文
+        StringBuilder context = new StringBuilder();
+        for (int i = 0; i < docs.size(); i++) {
+            context.append("[资料").append(i + 1).append("] ")
+                    .append(docs.get(i).getText())
+                    .append("\n\n");
+        }
+
+        // ④ 生成（RAG 生成 Prompt，呼应 Day 25 三原则）
+        String prompt = """  
+            你是企业知识库助手。请严格基于下方【参考资料】回答。  
+  
+            【参考资料】  
+            %s  
+  
+            【回答规则】  
+            1. 只使用参考资料中的内容，禁止用训练数据补充  
+            2. 参考资料中没有答案时，说"抱歉，知识库中暂未收录"  
+            3. 关键结论后标注来源，如 [资料1]  
+            4. 回答简洁，先给结论再给依据  
+  
+            【用户问题】  
+            %s  
+            """.formatted(context, query);
+
+        return chatClient.prompt()
+                .user(prompt)
+                .options(ChatOptions.builder().temperature(0.2).build())
+                .call()
+                .content();
+
     }
 }
