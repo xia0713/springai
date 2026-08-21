@@ -1,0 +1,28 @@
+src/main/java/com/example/springai/service/DocumentProcessingService.java
+  h_a118f437d6b52c 8,23-24,32,34,69-70
+  s_800b9615cd49e7::t_554c72f0da4015 54,56-60,64-65
+  s_800b9615cd49e7::t_ac45e056f475da 7,9-10
+src/main/java/com/example/springai/controller/VectorController.java
+  h_a118f437d6b52c 3,44,51-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "e7f5e79327fa4cc8d8597432a3e75b3fe2dcdd65",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_800b9615cd49e7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "61afc551-8343-40a6-8336-bfa3386965b3",
+        "model": "qwen3.7-plus"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
