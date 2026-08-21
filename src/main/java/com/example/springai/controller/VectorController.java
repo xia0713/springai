@@ -1,5 +1,6 @@
 package com.example.springai.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -40,14 +41,15 @@ public class VectorController {
     @GetMapping("/vector/search")
     public List<Map<String, Object>> search(
             @RequestParam String query,
+            @RequestParam String category,
             @RequestParam(defaultValue = "3") Integer topK) {
 
         List<Document> results = vectorStore.similaritySearch(
                 SearchRequest.builder()
                         .query(query)
                         .topK(topK)
-                        .similarityThreshold(0.7)              // 相似度阈值，低于此值不返回（默认 0.0，即全部返回）
-                        .filterExpression("category == 'tech'")  // 元数据过滤表达式
+                        .similarityThreshold(0.8)              // 相似度阈值，低于此值不返回（默认 0.0，即全部返回）
+                        .filterExpression(StringUtils.isBlank(category)?null:"category == '"+category+"'")  // 元数据过滤表达式
                         .build()
         );
 

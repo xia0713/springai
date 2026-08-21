@@ -4,6 +4,10 @@ import com.example.springai.config.TextCleanTransformer;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.Filter;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +20,8 @@ public class DocumentProcessingService {
 
     private final TextCleanTransformer textCleanTransformer;
 
+    private final VectorStore vectorStore;
+
     private final TokenTextSplitter splitter = TokenTextSplitter.builder()
             .withChunkSize(800)
             .withMinChunkSizeChars(350)
@@ -23,8 +29,9 @@ public class DocumentProcessingService {
             .withKeepSeparator(true)
             .build();
 
-    public DocumentProcessingService(TextCleanTransformer textCleanTransformer) {
+    public DocumentProcessingService(TextCleanTransformer textCleanTransformer, VectorStore vectorStore) {
         this.textCleanTransformer = textCleanTransformer;
+        this.vectorStore = vectorStore;
     }
 
     /**
@@ -44,14 +51,23 @@ public class DocumentProcessingService {
         // ③ 分块（TokenTextSplitter）
         docs = splitter.apply(docs);
 
-        // ④ 补充元数据（来源文件名，后面溯源用）
+        // ④ 补充元数据（来源文件名、分类、创建时间，后面溯源/过滤用）
         String filename = file.getOriginalFilename();
+        // 从文件名推导分类：去掉扩展名，比如 "WOS.pdf" -> "WOS"
+        String category = filename != null
+                ? filename.replaceAll("\\.[^.]+$", "")
+                : "unknown";
+        long createTime = System.currentTimeMillis();
         docs = docs.stream()
                 .map(d -> {
                     d.getMetadata().put("source", filename);
+                    d.getMetadata().put("category", category);
+                    d.getMetadata().put("createTime", createTime);
                     return d;
                 })
                 .toList();
+        // ⑤ 向量化入库（自动：文本转向量 + 批量写入）
+        vectorStore.add(docs);
 
         return docs;
     }
@@ -59,8 +75,6 @@ public class DocumentProcessingService {
     private List<Document> clean(List<Document> docs) {
 
         return textCleanTransformer.apply(docs);
-
-
 
 //        return docs.stream()
 //                .map(this::cleanOne)
