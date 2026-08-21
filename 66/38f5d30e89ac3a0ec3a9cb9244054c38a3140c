@@ -1,0 +1,36 @@
+src/main/java/com/example/springai/config/RagConfig.java
+  h_a118f437d6b52c 1-35
+pom.xml
+  h_a118f437d6b52c 152-155
+src/main/java/com/example/springai/controller/DocumentController.java
+  s_175493af2fdbf3::t_b041669167a068 11,25,29
+  s_175493af2fdbf3::t_7892b000e65162 18
+  s_175493af2fdbf3::t_ad4e396947fa38 61
+  h_a118f437d6b52c 3,5-6,8-10,12,14,27,30,48-60,62-80,82-103
+  s_175493af2fdbf3::t_596d031a6b2573 81
+src/main/java/com/example/springai/service/DocumentProcessingService.java
+  s_175493af2fdbf3::t_e07e36378e6c28 112
+  h_a118f437d6b52c 4-10,21,26,32-33,100-111,113-167
+  s_175493af2fdbf3::t_04ace65a261dc6 168
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "6638f5d30e89ac3a0ec3a9cb9244054c38a3140c",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_175493af2fdbf3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3afcbc5f-b592-4ed2-98ce-65f39d67fc42",
+        "model": "qwen3.7-plus"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
