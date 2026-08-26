@@ -1,0 +1,18 @@
+src/main/java/com/example/springai/service/RerankingService.java
+  h_a118f437d6b52c 1-72
+src/main/java/com/example/springai/service/HybridSearchService.java
+  h_a118f437d6b52c 47,56-59,69
+src/main/java/com/example/springai/service/AdvancedRagService.java
+  h_a118f437d6b52c 1-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d424bac0c4cf294e14670c48b640943fafc7bf51",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
