@@ -18,7 +18,7 @@ public class RerankingService {
 
     private final RestClient restClient;
 
-    @Value("${cohere.api-key}")
+    @Value("${cohere.api-key:cohereApiKey}")
     private String apiKey;
 
     public RerankingService() {
