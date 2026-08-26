@@ -72,3 +72,6 @@ logging:
   level:
     org.springframework.ai: DEBUG
     com.example.aiscaffold: DEBUG
+    # 开启 HTTP 请求日志，排查 404 问题
+    org.apache.hc.client5: DEBUG
+    reactor.netty.http.client: DEBUG
