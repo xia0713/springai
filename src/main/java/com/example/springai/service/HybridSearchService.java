@@ -44,7 +44,7 @@ public class HybridSearchService {
         FROM semantic_search s
         FULL OUTER JOIN keyword_search k ON s.id = k.id
         ORDER BY rrf_score DESC
-        LIMIT 20
+        LIMIT ?
         """;
 
     public HybridSearchService(JdbcTemplate jdbcTemplate, EmbeddingModel embeddingModel) {
@@ -53,6 +53,10 @@ public class HybridSearchService {
     }
 
     public List<Document> hybridSearch(String query) {
+        return hybridSearch(query, 20);
+    }
+
+    public List<Document> hybridSearch(String query,int count) {
         // 1. 把查询转成向量
         float[] embedding = embeddingModel.embed(query);
 
@@ -62,7 +66,7 @@ public class HybridSearchService {
             Map<String, Object> metadata = parseMetadata(rs.getString("metadata"));
             metadata.put("rrf_score", rs.getDouble("rrf_score"));
             return new Document(rs.getString("id"), content, metadata);
-        }, embedding, embedding, query, query);
+        }, embedding, embedding, query, query,count);
     }
 
     private Map<String, Object> parseMetadata(String json) {
