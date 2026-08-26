@@ -1,0 +1,23 @@
+src/main/java/com/example/springai/service/RerankingService.java
+  h_a118f437d6b52c 21
+src/main/java/com/example/springai/controller/MultiQueryRagController.java
+  h_a118f437d6b52c 1-30
+src/main/java/com/example/springai/controller/HybridSearchController.java
+  h_a118f437d6b52c 3,19-20,31-36,39
+  h_a118f437d6b52c 37-38
+src/main/java/com/example/springai/service/QueryRewritingService.java
+  h_a118f437d6b52c 1-52
+src/main/java/com/example/springai/service/MultiQueryRagService.java
+  h_a118f437d6b52c 1-84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c49d313c8ac7367965421b1e8df6b2657140a626",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
