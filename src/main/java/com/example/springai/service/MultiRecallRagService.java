@@ -39,42 +39,37 @@ public class MultiRecallRagService {
         this.chatClient = builder.build();
     }
 
-    public String answer(String question) {
-
-// 并行召回：三路同时跑
-        CompletableFuture<List<Document>> vectorFuture =
-                CompletableFuture.supplyAsync(() -> {
-                    // 路1 + 路2：混合检索（向量 + BM25，Day 37）
-                   return hybridSearch.hybridSearch(question);
-                });
-
-//        CompletableFuture<List<Document>> bm25Future =
-//                CompletableFuture.supplyAsync(() -> bm25Search(question));
+    /**
+     * 召回（不含生成）：并行多路召回 + 去重 + 重排序，返回 top 5。
+     * 供测试单独测 Recall@N。
+     */
+    public List<Document> retrieve(String question) {
+        // 并行召回：多路同时跑
+        CompletableFuture<List<Document>> hybridFuture =
+                CompletableFuture.supplyAsync(() -> hybridSearch.hybridSearch(question));
 
         CompletableFuture<List<Document>> multiQueryFuture =
                 CompletableFuture.supplyAsync(() -> {
-                    List<Document> result=new ArrayList<>();
+                    List<Document> result = new ArrayList<>();
                     // ① 查询改写（Day 39）
                     List<String> queries = new ArrayList<>();
                     queries.add(question);                        // 原始问题保留一路
                     queries.addAll(rewriter.rewrite(question));   // 3 个改写版本
-                    // 路3：多 Query 扩展（每个改写版本检索）
+                    // 多 Query 扩展（每个改写版本检索）
                     for (String q : queries) {
-                        List<Document> documents = vectorStore.similaritySearch(
+                        result.addAll(vectorStore.similaritySearch(
                                 SearchRequest.builder()
                                         .query(q)
                                         .topK(10)
                                         .similarityThreshold(0.4)   // 阈值调低，广召回
                                         .build()
-                        );
-                        result.addAll(documents);
+                        ));
                     }
                     return result;
                 });
 
-// 等待所有路完成，合并结果
-//        List<Document> merged = Stream.of(vectorFuture, bm25Future, multiQueryFuture)
-        List<Document> candidates = Stream.of(vectorFuture, multiQueryFuture)
+        // 等待所有路完成，合并 + 去重
+        List<Document> candidates = Stream.of(hybridFuture, multiQueryFuture)
                 .map(CompletableFuture::join)   // 阻塞等全部完成
                 .flatMap(List::stream)
                 .collect(Collectors.toMap(
@@ -83,13 +78,19 @@ public class MultiRecallRagService {
                 .values().stream().toList();
 
         if (candidates.isEmpty()) {
-            return "抱歉，知识库中暂未收录该问题。";
+            return List.of();
         }
 
-        // ③ RRF 融合已在混合检索内部完成，这里按去重后的候选进入精排
-
         // ④ 重排序（Day 38，用原始 query！）
-        List<Document> topContext = reranker.rerank(question, candidates, 5);
+        return reranker.rerank(question, candidates, 5);
+    }
+
+    public String answer(String question) {
+        List<Document> topContext = retrieve(question);
+
+        if (topContext.isEmpty()) {
+            return "抱歉，知识库中暂未收录该问题。";
+        }
 
         // ⑤ 生成
         String context = topContext.stream()

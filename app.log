@@ -1,0 +1,160 @@
+[WARNING] Error injecting: org.springframework.boot.maven.RunMojo
+java.lang.TypeNotPresentException: Type org.springframework.boot.maven.RunMojo not present
+    at org.eclipse.sisu.space.URLClassSpace.loadClass (URLClassSpace.java:125)
+    at org.eclipse.sisu.space.NamedClass.load (NamedClass.java:45)
+    at org.eclipse.sisu.space.AbstractDeferredClass.get (AbstractDeferredClass.java:45)
+    at com.google.inject.internal.ProviderInternalFactory.provision (ProviderInternalFactory.java:86)
+    at com.google.inject.internal.InternalFactoryToInitializableAdapter.provision (InternalFactoryToInitializableAdapter.java:57)
+    at com.google.inject.internal.ProviderInternalFactory$1.call (ProviderInternalFactory.java:67)
+    at com.google.inject.internal.ProvisionListenerStackCallback$Provision.provision (ProvisionListenerStackCallback.java:109)
+    at com.google.inject.internal.ProvisionListenerStackCallback$Provision.provision (ProvisionListenerStackCallback.java:124)
+    at com.google.inject.internal.ProvisionListenerStackCallback.provision (ProvisionListenerStackCallback.java:66)
+    at com.google.inject.internal.ProviderInternalFactory.circularGet (ProviderInternalFactory.java:62)
+    at com.google.inject.internal.InternalFactoryToInitializableAdapter.get (InternalFactoryToInitializableAdapter.java:47)
+    at com.google.inject.internal.InjectorImpl$1.get (InjectorImpl.java:1101)
+    at org.eclipse.sisu.inject.Guice4$2.get (Guice4.java:184)
+    at org.eclipse.sisu.inject.LazyBeanEntry.getValue (LazyBeanEntry.java:71)
+    at org.eclipse.sisu.plexus.LazyPlexusBean.getValue (LazyPlexusBean.java:48)
+    at org.codehaus.plexus.DefaultPlexusContainer.lookup (DefaultPlexusContainer.java:246)
+    at org.codehaus.plexus.DefaultPlexusContainer.lookup (DefaultPlexusContainer.java:240)
+    at org.apache.maven.plugin.internal.DefaultMavenPluginManager.getConfiguredMojo (DefaultMavenPluginManager.java:503)
+    at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo (DefaultBuildPluginManager.java:114)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2 (MojoExecutor.java:328)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute (MojoExecutor.java:316)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:212)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:174)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.access$000 (MojoExecutor.java:75)
+    at org.apache.maven.lifecycle.internal.MojoExecutor$1.run (MojoExecutor.java:162)
+    at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute (DefaultMojosExecutionStrategy.java:39)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:159)
+    at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject (LifecycleModuleBuilder.java:105)
+    at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject (LifecycleModuleBuilder.java:73)
+    at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build (SingleThreadedBuilder.java:53)
+    at org.apache.maven.lifecycle.internal.LifecycleStarter.execute (LifecycleStarter.java:118)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:261)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:173)
+    at org.apache.maven.DefaultMaven.execute (DefaultMaven.java:101)
+    at org.apache.maven.cli.MavenCli.execute (MavenCli.java:919)
+    at org.apache.maven.cli.MavenCli.doMain (MavenCli.java:285)
+    at org.apache.maven.cli.MavenCli.main (MavenCli.java:207)
+    at sun.reflect.NativeMethodAccessorImpl.invoke0 (Native Method)
+    at sun.reflect.NativeMethodAccessorImpl.invoke (NativeMethodAccessorImpl.java:62)
+    at sun.reflect.DelegatingMethodAccessorImpl.invoke (DelegatingMethodAccessorImpl.java:43)
+    at java.lang.reflect.Method.invoke (Method.java:498)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced (Launcher.java:255)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launch (Launcher.java:201)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode (Launcher.java:362)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.main (Launcher.java:314)
+Caused by: java.lang.UnsupportedClassVersionError: org/springframework/boot/maven/RunMojo has been compiled by a more recent version of the Java Runtime (class file version 61.0), this version of the Java Runtime only recognizes class file versions up to 52.0
+    at java.lang.ClassLoader.defineClass1 (Native Method)
+    at java.lang.ClassLoader.defineClass (ClassLoader.java:760)
+    at java.security.SecureClassLoader.defineClass (SecureClassLoader.java:142)
+    at java.net.URLClassLoader.defineClass (URLClassLoader.java:467)
+    at java.net.URLClassLoader.access$100 (URLClassLoader.java:73)
+    at java.net.URLClassLoader$1.run (URLClassLoader.java:368)
+    at java.net.URLClassLoader$1.run (URLClassLoader.java:362)
+    at java.security.AccessController.doPrivileged (Native Method)
+    at java.net.URLClassLoader.findClass (URLClassLoader.java:361)
+    at org.codehaus.plexus.classworlds.realm.ClassRealm.findClassInternal (ClassRealm.java:243)
+    at org.codehaus.plexus.classworlds.realm.ClassRealm.loadClassFromSelf (ClassRealm.java:338)
+    at org.codehaus.plexus.classworlds.strategy.SelfFirstStrategy.loadClass (SelfFirstStrategy.java:36)
+    at org.codehaus.plexus.classworlds.realm.ClassRealm.unsynchronizedLoadClass (ClassRealm.java:211)
+    at org.codehaus.plexus.classworlds.realm.ClassRealm.loadClass (ClassRealm.java:202)
+    at org.codehaus.plexus.classworlds.realm.ClassRealm.loadClass (ClassRealm.java:198)
+    at org.eclipse.sisu.space.URLClassSpace.loadClass (URLClassSpace.java:123)
+    at org.eclipse.sisu.space.NamedClass.load (NamedClass.java:45)
+    at org.eclipse.sisu.space.AbstractDeferredClass.get (AbstractDeferredClass.java:45)
+    at com.google.inject.internal.ProviderInternalFactory.provision (ProviderInternalFactory.java:86)
+    at com.google.inject.internal.InternalFactoryToInitializableAdapter.provision (InternalFactoryToInitializableAdapter.java:57)
+    at com.google.inject.internal.ProviderInternalFactory$1.call (ProviderInternalFactory.java:67)
+    at com.google.inject.internal.ProvisionListenerStackCallback$Provision.provision (ProvisionListenerStackCallback.java:109)
+    at com.google.inject.internal.ProvisionListenerStackCallback$Provision.provision (ProvisionListenerStackCallback.java:124)
+    at com.google.inject.internal.ProvisionListenerStackCallback.provision (ProvisionListenerStackCallback.java:66)
+    at com.google.inject.internal.ProviderInternalFactory.circularGet (ProviderInternalFactory.java:62)
+    at com.google.inject.internal.InternalFactoryToInitializableAdapter.get (InternalFactoryToInitializableAdapter.java:47)
+    at com.google.inject.internal.InjectorImpl$1.get (InjectorImpl.java:1101)
+    at org.eclipse.sisu.inject.Guice4$2.get (Guice4.java:184)
+    at org.eclipse.sisu.inject.LazyBeanEntry.getValue (LazyBeanEntry.java:71)
+    at org.eclipse.sisu.plexus.LazyPlexusBean.getValue (LazyPlexusBean.java:48)
+    at org.codehaus.plexus.DefaultPlexusContainer.lookup (DefaultPlexusContainer.java:246)
+    at org.codehaus.plexus.DefaultPlexusContainer.lookup (DefaultPlexusContainer.java:240)
+    at org.apache.maven.plugin.internal.DefaultMavenPluginManager.getConfiguredMojo (DefaultMavenPluginManager.java:503)
+    at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo (DefaultBuildPluginManager.java:114)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2 (MojoExecutor.java:328)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute (MojoExecutor.java:316)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:212)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:174)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.access$000 (MojoExecutor.java:75)
+    at org.apache.maven.lifecycle.internal.MojoExecutor$1.run (MojoExecutor.java:162)
+    at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute (DefaultMojosExecutionStrategy.java:39)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:159)
+    at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject (LifecycleModuleBuilder.java:105)
+    at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject (LifecycleModuleBuilder.java:73)
+    at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build (SingleThreadedBuilder.java:53)
+    at org.apache.maven.lifecycle.internal.LifecycleStarter.execute (LifecycleStarter.java:118)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:261)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:173)
+    at org.apache.maven.DefaultMaven.execute (DefaultMaven.java:101)
+    at org.apache.maven.cli.MavenCli.execute (MavenCli.java:919)
+    at org.apache.maven.cli.MavenCli.doMain (MavenCli.java:285)
+    at org.apache.maven.cli.MavenCli.main (MavenCli.java:207)
+    at sun.reflect.NativeMethodAccessorImpl.invoke0 (Native Method)
+    at sun.reflect.NativeMethodAccessorImpl.invoke (NativeMethodAccessorImpl.java:62)
+    at sun.reflect.DelegatingMethodAccessorImpl.invoke (DelegatingMethodAccessorImpl.java:43)
+    at java.lang.reflect.Method.invoke (Method.java:498)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced (Launcher.java:255)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launch (Launcher.java:201)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode (Launcher.java:362)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.main (Launcher.java:314)
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.4.4:run (default-cli) on project SpringAI: Execution default-cli of goal org.springframework.boot:spring-boot-maven-plugin:3.4.4:run failed: Unable to load the mojo 'run' in the plugin 'org.springframework.boot:spring-boot-maven-plugin:3.4.4' due to an API incompatibility: org.codehaus.plexus.component.repository.exception.ComponentLookupException: org/springframework/boot/maven/RunMojo has been compiled by a more recent version of the Java Runtime (class file version 61.0), this version of the Java Runtime only recognizes class file versions up to 52.0
+[ERROR] -----------------------------------------------------
+[ERROR] realm =    plugin>org.springframework.boot:spring-boot-maven-plugin:3.4.4
+[ERROR] strategy = org.codehaus.plexus.classworlds.strategy.SelfFirstStrategy
+[ERROR] urls[0] = file:/C:/Users/zt23006/.m2/repository/org/springframework/boot/spring-boot-maven-plugin/3.4.4/spring-boot-maven-plugin-3.4.4.jar
+[ERROR] urls[1] = file:/C:/Users/zt23006/.m2/repository/org/springframework/boot/spring-boot-buildpack-platform/3.4.4/spring-boot-buildpack-platform-3.4.4.jar
+[ERROR] urls[2] = file:/C:/Users/zt23006/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.18.3/jackson-databind-2.18.3.jar
+[ERROR] urls[3] = file:/C:/Users/zt23006/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.18.3/jackson-annotations-2.18.3.jar
+[ERROR] urls[4] = file:/C:/Users/zt23006/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.18.3/jackson-core-2.18.3.jar
+[ERROR] urls[5] = file:/C:/Users/zt23006/.m2/repository/com/fasterxml/jackson/module/jackson-module-parameter-names/2.18.3/jackson-module-parameter-names-2.18.3.jar
+[ERROR] urls[6] = file:/C:/Users/zt23006/.m2/repository/net/java/dev/jna/jna-platform/5.13.0/jna-platform-5.13.0.jar
+[ERROR] urls[7] = file:/C:/Users/zt23006/.m2/repository/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar
+[ERROR] urls[8] = file:/C:/Users/zt23006/.m2/repository/org/apache/commons/commons-compress/1.25.0/commons-compress-1.25.0.jar
+[ERROR] urls[9] = file:/C:/Users/zt23006/.m2/repository/org/apache/httpcomponents/client5/httpclient5/5.4.2/httpclient5-5.4.2.jar
+[ERROR] urls[10] = file:/C:/Users/zt23006/.m2/repository/org/apache/httpcomponents/core5/httpcore5/5.3.3/httpcore5-5.3.3.jar
+[ERROR] urls[11] = file:/C:/Users/zt23006/.m2/repository/org/apache/httpcomponents/core5/httpcore5-h2/5.3.3/httpcore5-h2-5.3.3.jar
+[ERROR] urls[12] = file:/C:/Users/zt23006/.m2/repository/org/tomlj/tomlj/1.0.0/tomlj-1.0.0.jar
+[ERROR] urls[13] = file:/C:/Users/zt23006/.m2/repository/org/antlr/antlr4-runtime/4.7.2/antlr4-runtime-4.7.2.jar
+[ERROR] urls[14] = file:/C:/Users/zt23006/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar
+[ERROR] urls[15] = file:/C:/Users/zt23006/.m2/repository/org/springframework/boot/spring-boot-loader-tools/3.4.4/spring-boot-loader-tools-3.4.4.jar
+[ERROR] urls[16] = file:/C:/Users/zt23006/.m2/repository/org/apache/maven/shared/maven-common-artifact-filters/3.3.2/maven-common-artifact-filters-3.3.2.jar
+[ERROR] urls[17] = file:/C:/Users/zt23006/.m2/repository/org/sonatype/plexus/plexus-build-api/0.0.7/plexus-build-api-0.0.7.jar
+[ERROR] urls[18] = file:/C:/Users/zt23006/.m2/repository/org/springframework/spring-core/6.2.5/spring-core-6.2.5.jar
+[ERROR] urls[19] = file:/C:/Users/zt23006/.m2/repository/org/springframework/spring-jcl/6.2.5/spring-jcl-6.2.5.jar
+[ERROR] urls[20] = file:/C:/Users/zt23006/.m2/repository/org/springframework/spring-context/6.2.5/spring-context-6.2.5.jar
+[ERROR] urls[21] = file:/C:/Users/zt23006/.m2/repository/org/springframework/spring-aop/6.2.5/spring-aop-6.2.5.jar
+[ERROR] urls[22] = file:/C:/Users/zt23006/.m2/repository/org/springframework/spring-beans/6.2.5/spring-beans-6.2.5.jar
+[ERROR] urls[23] = file:/C:/Users/zt23006/.m2/repository/org/springframework/spring-expression/6.2.5/spring-expression-6.2.5.jar
+[ERROR] urls[24] = file:/C:/Users/zt23006/.m2/repository/io/micrometer/micrometer-observation/1.14.5/micrometer-observation-1.14.5.jar
+[ERROR] urls[25] = file:/C:/Users/zt23006/.m2/repository/io/micrometer/micrometer-commons/1.14.5/micrometer-commons-1.14.5.jar
+[ERROR] urls[26] = file:/C:/Users/zt23006/.m2/repository/org/apache/maven/plugins/maven-shade-plugin/3.5.0/maven-shade-plugin-3.5.0.jar
+[ERROR] urls[27] = file:/C:/Users/zt23006/.m2/repository/org/codehaus/plexus/plexus-utils/3.5.1/plexus-utils-3.5.1.jar
+[ERROR] urls[28] = file:/C:/Users/zt23006/.m2/repository/org/ow2/asm/asm/9.5/asm-9.5.jar
+[ERROR] urls[29] = file:/C:/Users/zt23006/.m2/repository/org/ow2/asm/asm-commons/9.5/asm-commons-9.5.jar
+[ERROR] urls[30] = file:/C:/Users/zt23006/.m2/repository/org/ow2/asm/asm-tree/9.5/asm-tree-9.5.jar
+[ERROR] urls[31] = file:/C:/Users/zt23006/.m2/repository/org/jdom/jdom2/2.0.6.1/jdom2-2.0.6.1.jar
+[ERROR] urls[32] = file:/C:/Users/zt23006/.m2/repository/org/apache/maven/shared/maven-dependency-tree/3.2.1/maven-dependency-tree-3.2.1.jar
+[ERROR] urls[33] = file:/C:/Users/zt23006/.m2/repository/commons-io/commons-io/2.13.0/commons-io-2.13.0.jar
+[ERROR] urls[34] = file:/C:/Users/zt23006/.m2/repository/org/vafer/jdependency/2.8.0/jdependency-2.8.0.jar
+[ERROR] urls[35] = file:/C:/Users/zt23006/.m2/repository/org/apache/commons/commons-collections4/4.4/commons-collections4-4.4.jar
+[ERROR] Number of foreign imports: 1
+[ERROR] import: Entry[import  from realm ClassRealm[maven.api, parent: null]]
+[ERROR] 
+[ERROR] -----------------------------------------------------
+[ERROR] 
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/PluginContainerException
