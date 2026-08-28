@@ -1,0 +1,59 @@
+src/main/java/com/example/springai/model/DocumentBatchTask.java
+  h_a118f437d6b52c 1-63
+src/main/java/com/example/springai/component/BatchTaskStore.java
+  h_a118f437d6b52c 1-21
+src/main/java/com/example/springai/component/BatchDocumentProcessor.java
+  h_a118f437d6b52c 1-48
+src/main/java/com/example/springai/service/BatchDocumentService.java
+  h_a118f437d6b52c 1-70
+src/main/resources/application.yaml
+  h_a118f437d6b52c 10-11
+src/main/java/com/example/springai/service/DocumentProcessingService.java
+  h_a118f437d6b52c 18,20-21,27,173-210
+  s_276b71d8875415::t_e577dac6a34e7b 211
+src/main/java/com/example/springai/controller/DocumentController.java
+  h_a118f437d6b52c 4-5,34,36,39,59-76,78-79
+  s_175493af2fdbf3::t_5e8671285789be 77
+pom.xml
+  h_a118f437d6b52c 157-166
+  s_276b71d8875415::t_f952bcb89fd10b 231-238
+docs/Day43-批量文档处理-异步任务与失败重试.md
+  h_a118f437d6b52c 404
+src/main/java/com/example/springai/service/QueryRewritingService.java
+  s_276b71d8875415::t_86d0ad2d1416ef 3-6,8,11,13,16-20,25-28,30-38,57-69,72,78-94
+src/test/java/com/example/springai/chunking/ChunkTest.java
+  s_276b71d8875415::t_f3775966034cb0 163
+  s_276b71d8875415::t_8c7b61ed3a9c43 8,10,16,30-31,40,44,53,57,60-74,77-91,94-103,110-119,164,169
+  s_276b71d8875415::t_ab3431d104ac89 35-39
+src/main/java/com/example/springai/config/AsyncConfig.java
+  h_a118f437d6b52c 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "80c9fd979add2983004ff6420e23452df590c6a2",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_175493af2fdbf3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3afcbc5f-b592-4ed2-98ce-65f39d67fc42",
+        "model": "unknown"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    },
+    "s_276b71d8875415": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a43b3fb8-8b23-4999-8d55-5efe6f8bcb3c",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
