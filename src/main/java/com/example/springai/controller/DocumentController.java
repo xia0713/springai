@@ -1,6 +1,8 @@
 package com.example.springai.controller;
 
 import com.example.springai.dto.ChatRequest;
+import com.example.springai.model.DocumentBatchTask;
+import com.example.springai.service.BatchDocumentService;
 import com.example.springai.service.DocumentProcessingService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -29,10 +31,12 @@ public class DocumentController {
 
     private final DocumentProcessingService processingService;
     private final VectorStore vectorStore;
+    private final BatchDocumentService batchService;   // 构造器里加这个依赖
 
-    public DocumentController(DocumentProcessingService processingService, VectorStore vectorStore, ChatClient ragChatClient) {
+    public DocumentController(DocumentProcessingService processingService, VectorStore vectorStore, BatchDocumentService batchService, ChatClient ragChatClient) {
         this.processingService = processingService;
         this.vectorStore = vectorStore;
+        this.batchService = batchService;
         this.ragChatClient = ragChatClient;
     }
 
@@ -49,6 +53,27 @@ public class DocumentController {
                         .mapToInt(String::length)
                         .sum()                        // 总字符数
         );
+    }
+
+
+    /**
+     * 批量上传：多文件，秒回 taskId
+     * 注意：这里要用 MultipartFile[] 或 List<MultipartFile> 接收多文件
+     */
+    @PostMapping("/batch/upload")
+    public Map<String, String> batchUpload(@RequestParam("files") List<MultipartFile> files) throws IOException {
+        String taskId = batchService.submit(files);
+        return Map.of(
+                "taskId", taskId,
+                "total", String.valueOf(files.size()),
+                "hint", "轮询 GET /api/documents/batch/" + taskId + " 查进度"
+        );
+    }
+
+    /** 查询批次进度 */
+    @GetMapping("/batch/{taskId}")
+    public DocumentBatchTask batchStatus(@PathVariable String taskId) {
+        return batchService.getStatus(taskId);
     }
 
 

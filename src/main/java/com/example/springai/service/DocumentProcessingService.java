@@ -15,12 +15,16 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -165,5 +169,44 @@ public class DocumentProcessingService {
                 .call()
                 .content();
 
+    }
+
+
+    /**
+     * 批量任务专用：解析 → 清洗 → 分块 → 向量化入库，整体可重试。
+     * 用 @Retryable：embedding API 偶发超时/限流时自动重试 3 次（1s→2s→4s 指数退避）。
+     */
+    @Retryable(
+            retryFor = Exception.class,
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 1000, multiplier = 2, maxDelay = 8000)
+    )
+    public int processAndStore(Path file, String filename) throws Exception {
+        Resource resource = new FileSystemResource(file.toFile());
+
+        // ① 解析（Tika）
+        TikaDocumentReader reader = new TikaDocumentReader(resource);
+        List<Document> docs = reader.read();
+
+        // ② 清洗
+        docs = textCleanTransformer.apply(docs);
+
+        // ③ 分块
+        docs = splitter.apply(docs);
+
+        // ④ 补元数据
+        String category = filename != null ? filename.replaceAll("\\.[^.]+$", "") : "unknown";
+        long createTime = System.currentTimeMillis();
+        docs = docs.stream().map(d -> {
+            d.getMetadata().put("source", filename);
+            d.getMetadata().put("category", category);
+            d.getMetadata().put("createTime", createTime);
+            return d;
+        }).toList();
+
+        // ⑤ 向量化入库
+        vectorStore.add(docs);
+
+        return docs.size();   // 返回分块数，供进度明细展示
     }
 }

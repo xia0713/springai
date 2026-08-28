@@ -7,8 +7,8 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 10MB              # 允许上传较大图片
-      max-request-size: 10MB
+      max-file-size: 20MB              # 允许上传较大图片
+      max-request-size: 200MB         # 整个请求上限（批量上传必须放大）
 
   datasource:
     url: jdbc:postgresql://localhost:5432/ai_db

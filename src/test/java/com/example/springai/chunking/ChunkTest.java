@@ -5,12 +5,15 @@ import com.example.springai.service.HybridSearchService;
 import com.example.springai.service.MultiRecallRagService;
 import com.example.springai.service.QueryRewritingService;
 import com.example.springai.service.RerankingService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -24,15 +27,21 @@ import java.util.function.Function;
  * 逐项加优化，记录每个优化对 Recall@5 的贡献：
  * V0 纯向量 → V1 混合检索 → V2 重排序 → V3 查询改写 → V4 多路召回整合。
  * <p>
- * 只测「召回」环节（不含 LLM 生成），用 {@code expectedDoc} 是否进入 top5 判定命中，
- * 避免为 40 条查询反复调用大模型生成、省 token 且结果确定。
+ * 只测「召回」环节（不含 LLM 生成），用 {@link RagTestCorpus} 细粒度语料，
+ * 以 chunk 的 factId 是否进入 top5 判定命中，避免大模型生成、省 token 且结果确定。
  * <p>
  * 依赖真实 pgvector + embedding（重排无 Cohere Key 时走 embedding 本地重排）。
  */
-@SpringBootTest
+@SpringBootTest(properties = {
+        "logging.level.org.springframework.ai=INFO",
+        "logging.level.reactor.netty.http.client=WARN",
+        "logging.level.org.apache.hc.client5=WARN"
+})
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ChunkTest {
 
     @Autowired VectorStore vectorStore;
+    @Autowired JdbcTemplate jdbcTemplate;
     @Autowired HybridSearchService hybridSearch;
     @Autowired QueryRewritingService rewriter;
     @Autowired RerankingService reranker;
@@ -41,62 +50,72 @@ class ChunkTest {
 
     // ============ 测试用例定义 ============
 
-    record TestCase(String question, String expectedDoc, TestType type) {}
+    record TestCase(String question, String expectedFactId, TestType type) {}
 
     enum TestType { SEMANTIC, EXACT, EDGE }
 
-    /** 40 条有答案查询。expectedDoc 已与 vector_store 实际 source 对齐。 */
+    /** 40 条有答案查询。expectedFactId 指向 RagTestCorpus 里的唯一 chunk。 */
     static final List<TestCase> TEST_SET = List.of(
             // ===== 语义查询（15）：同义词、改写、口语化 =====
-            new TestCase("退货需要什么条件？", "退货退款政策.pdf", TestType.SEMANTIC),
-            new TestCase("怎么申请退款？", "退货退款政策.pdf", TestType.SEMANTIC),
-            new TestCase("钱什么时候能退回来？", "退货退款政策.pdf", TestType.SEMANTIC),
-            new TestCase("退货邮费谁出？", "退货退款政策.pdf", TestType.SEMANTIC),
-            new TestCase("退货运费怎么算？", "退货退款政策.pdf", TestType.SEMANTIC),
-            new TestCase("上班时间是几点？", "公司员工手册.pdf", TestType.SEMANTIC),
-            new TestCase("一年有多少天年假？", "公司员工手册.pdf", TestType.SEMANTIC),
-            new TestCase("报销怎么走流程？", "公司员工手册.pdf", TestType.SEMANTIC),
-            new TestCase("耳机充满电能听多久？", "蓝牙耳机 X1 产品说明.md", TestType.SEMANTIC),
-            new TestCase("手表防不防水？", "蓝牙耳机 X1 产品说明.md", TestType.SEMANTIC),
-            new TestCase("怎么升级成会员？", "电商平台会员政策.pfd", TestType.SEMANTIC),
-            new TestCase("积分能干嘛？", "电商平台会员政策.pfd", TestType.SEMANTIC),
-            new TestCase("员工迟到会怎么样？", "公司员工手册.pdf", TestType.SEMANTIC),
-            new TestCase("生病请假要什么手续？", "公司员工手册.pdf", TestType.SEMANTIC),
-            new TestCase("买的东西不满意想退，有什么要求？", "退货退款政策.pdf", TestType.SEMANTIC),
+            new TestCase("退货需要什么条件？", "RET-7天", TestType.SEMANTIC),
+            new TestCase("怎么申请退款？", "RET-流程", TestType.SEMANTIC),
+            new TestCase("钱什么时候能退回来？", "RET-退款支付宝", TestType.SEMANTIC),
+            new TestCase("退货邮费谁出？", "RET-邮费", TestType.SEMANTIC),
+            new TestCase("退货运费怎么算？", "RET-邮费", TestType.SEMANTIC),
+            new TestCase("上班时间是几点？", "EMP-工作时间", TestType.SEMANTIC),
+            new TestCase("一年有多少天年假？", "EMP-年假", TestType.SEMANTIC),
+            new TestCase("报销怎么走流程？", "EMP-报销流程", TestType.SEMANTIC),
+            new TestCase("耳机充满电能听多久？", "X1-续航", TestType.SEMANTIC),
+            new TestCase("手表防不防水？", "S2-防水", TestType.SEMANTIC),
+            new TestCase("怎么升级成会员？", "VIP-银卡门槛", TestType.SEMANTIC),
+            new TestCase("积分能干嘛？", "VIP-积分抵扣", TestType.SEMANTIC),
+            new TestCase("员工迟到会怎么样？", "EMP-迟到", TestType.SEMANTIC),
+            new TestCase("生病请假要什么手续？", "EMP-病假", TestType.SEMANTIC),
+            new TestCase("买的东西不满意想退，有什么要求？", "RET-7天", TestType.SEMANTIC),
 
             // ===== 精确查询（15）：订单号、错误码、型号、数字 =====
-            new TestCase("订单号 ORD-142 的物流状态？", "物流记录.xlsx", TestType.EXACT),
-            new TestCase("订单号 ORD-144 什么时候发货？", "物流记录.xlsx", TestType.EXACT),
-            new TestCase("错误码 503 什么意思？", "系统错误码.pdf", TestType.EXACT),
-            new TestCase("错误码 403 是什么问题？", "系统错误码.pdf", TestType.EXACT),
-            new TestCase("错误码 502 是什么问题？", "系统错误码.pdf", TestType.EXACT),
-            new TestCase("错误码 401 怎么处理？", "系统错误码.pdf", TestType.EXACT),
-            new TestCase("蓝牙耳机 X1 防水等级？", "蓝牙耳机 X1 产品说明.md", TestType.EXACT),
-            new TestCase("蓝牙耳机 X1 蓝牙版本？", "蓝牙耳机 X1 产品说明.md", TestType.EXACT),
-            new TestCase("智能手表 S2 续航多久？", "蓝牙耳机 X1 产品说明.md", TestType.EXACT),
-            new TestCase("智能手表 S2 屏幕多大？", "蓝牙耳机 X1 产品说明.md", TestType.EXACT),
-            new TestCase("耳机 X1 单只多重？", "蓝牙耳机 X1 产品说明.md", TestType.EXACT),
-            new TestCase("订单号 ORD-145 到了吗？", "物流记录.xlsx", TestType.EXACT),
-            new TestCase("订单号 ORD-143 什么时候到？", "物流记录.xlsx", TestType.EXACT),
-            new TestCase("错误码 1001 是什么？", "系统错误码.pdf", TestType.EXACT),
-            new TestCase("运动鞋 R3 有什么尺码？", "蓝牙耳机 X1 产品说明.md", TestType.EXACT),
+            new TestCase("订单号 ORD-142 的物流状态？", "ORD-142", TestType.EXACT),
+            new TestCase("订单号 ORD-144 什么时候发货？", "ORD-144", TestType.EXACT),
+            new TestCase("错误码 503 什么意思？", "ERR-503", TestType.EXACT),
+            new TestCase("错误码 403 是什么问题？", "ERR-403", TestType.EXACT),
+            new TestCase("错误码 502 是什么问题？", "ERR-502", TestType.EXACT),
+            new TestCase("错误码 401 怎么处理？", "ERR-401", TestType.EXACT),
+            new TestCase("蓝牙耳机 X1 防水等级？", "X1-防水", TestType.EXACT),
+            new TestCase("蓝牙耳机 X1 蓝牙版本？", "X1-蓝牙", TestType.EXACT),
+            new TestCase("智能手表 S2 续航多久？", "S2-续航", TestType.EXACT),
+            new TestCase("智能手表 S2 屏幕多大？", "S2-屏幕", TestType.EXACT),
+            new TestCase("耳机 X1 单只多重？", "X1-重量", TestType.EXACT),
+            new TestCase("订单号 ORD-145 到了吗？", "ORD-145", TestType.EXACT),
+            new TestCase("订单号 ORD-143 什么时候到？", "ORD-143", TestType.EXACT),
+            new TestCase("错误码 1001 是什么？", "ERR-1001", TestType.EXACT),
+            new TestCase("运动鞋 R3 有什么尺码？", "R3-尺码", TestType.EXACT),
 
             // ===== 边界查询（10）：模糊、多跳、跨文档、条件判断 =====
-            new TestCase("买了耳机发现有问题，能退吗？", "退货退款政策.pdf", TestType.EDGE),
-            new TestCase("退货后钱多久到账，用支付宝的话？", "退货退款政策.pdf", TestType.EDGE),
-            new TestCase("银卡和金卡会员折扣差多少？", "电商平台会员政策.pfd", TestType.EDGE),
-            new TestCase("商品有质量问题，退货运费自理还是商家出？", "退货退款政策.pdf", TestType.EDGE),
-            new TestCase("工作满一年能请几天不扣钱的假？", "公司员工手册.pdf", TestType.EDGE),
-            new TestCase("报销什么时候能到账？", "公司员工手册.pdf", TestType.EDGE),
-            new TestCase("想升到钻石会员要花多少钱？", "电商平台会员政策.pfd", TestType.EDGE),
-            new TestCase("蓝牙耳机和智能手表哪个续航长？", "蓝牙耳机 X1 产品说明.md", TestType.EDGE),
-            new TestCase("差旅报销要准备什么材料？", "公司员工手册.pdf", TestType.EDGE),
-            new TestCase("哪些商品不能退货？", "退货退款政策.pdf", TestType.EDGE)
+            new TestCase("买了耳机发现有问题，能退吗？", "RET-质量30天", TestType.EDGE),
+            new TestCase("退货后钱多久到账，用支付宝的话？", "RET-退款支付宝", TestType.EDGE),
+            new TestCase("银卡和金卡会员折扣差多少？", "VIP-金卡折扣", TestType.EDGE),
+            new TestCase("商品有质量问题，退货运费自理还是商家出？", "RET-邮费", TestType.EDGE),
+            new TestCase("工作满一年能请几天不扣钱的假？", "EMP-年假", TestType.EDGE),
+            new TestCase("报销什么时候能到账？", "EMP-报销打款", TestType.EDGE),
+            new TestCase("想升到钻石会员要花多少钱？", "VIP-钻石门槛", TestType.EDGE),
+            new TestCase("蓝牙耳机和智能手表哪个续航长？", "S2-续航", TestType.EDGE),
+            new TestCase("差旅报销要准备什么材料？", "EMP-差旅材料", TestType.EDGE),
+            new TestCase("哪些商品不能退货？", "RET-不可退", TestType.EDGE)
     );
 
     // ============ 版本定义（逐项加优化） ============
 
     record Version(String name, String config, Function<String, List<Document>> retriever) {}
+
+    @BeforeAll
+    void seedCorpus() {
+        if (!RagTestCorpus.isSeeded(jdbcTemplate)) {
+            int n = RagTestCorpus.seed(vectorStore, jdbcTemplate);
+            System.out.println("已灌入细粒度语料 " + n + " 条 chunk");
+        } else {
+            System.out.println("语料已存在，跳过灌库");
+        }
+    }
 
     @Test
     void 逐项加优化对比Recall() {
@@ -141,13 +160,13 @@ class ChunkTest {
             h[1]++;
             try {
                 boolean found = v.retriever().apply(tc.question()).stream()
-                        .map(ChunkTest::source)
-                        .anyMatch(tc.expectedDoc()::equals);
+                        .map(d -> String.valueOf(d.getMetadata().get("factId")))
+                        .anyMatch(tc.expectedFactId()::equals);
                 if (found) {
                     hit++;
                     h[0]++;
                 } else {
-                    missed.add(tc.question() + "  (期望 " + tc.expectedDoc() + ")");
+                    missed.add(tc.question() + "  (期望 " + tc.expectedFactId() + ")");
                 }
             } catch (Exception e) {
                 errors++;
@@ -160,10 +179,6 @@ class ChunkTest {
         per.forEach((t, h) -> byType.put(t, h[1] == 0 ? 0.0 : h[0] * 100.0 / h[1]));
 
         return new RecallResult(v.name(), hit * 100.0 / cases.size(), byType, missed, errors);
-    }
-
-    private static String source(Document d) {
-        return String.valueOf(d.getMetadata().getOrDefault("source", ""));
     }
 
     // ============ 输出 ============

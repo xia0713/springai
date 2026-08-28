@@ -401,6 +401,7 @@ public class BatchDocumentProcessor {
 ```java
 package com.example.springai.service;
 
+import com.example.springai.component.BatchDocumentProcessor;
 import com.example.springai.exception.AiException;
 import com.example.springai.model.DocumentBatchTask;
 import com.example.springai.model.DocumentBatchTask.TaskStatus;

@@ -154,6 +154,16 @@
             <artifactId>spring-ai-advisors-vector-store</artifactId>
         </dependency>
 
+        <!-- Spring Retry：失败重试 -->
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+        </dependency>
+        <!-- @Retryable 依赖 AOP，必须加 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
     </dependencies>
     <!-- Maven Central 直连，绕过 alimaven 镜像（阿里云未同步 Spring AI 1.0.3） -->
     <repositories>
@@ -217,6 +227,14 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- 测试 System.out 中文输出按 UTF-8，避免 Windows 下乱码 -->
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>
