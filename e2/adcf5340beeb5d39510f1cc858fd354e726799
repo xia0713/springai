@@ -1,0 +1,100 @@
+src/test/java/com/example/springai/chunking/ChunkingTest.java
+  s_4e6ea50263c953::t_5b10bc76be1082 1-202
+src/main/java/com/example/springai/service/MultiRecallRagService.java
+  s_276b71d8875415::t_9764124e0eeca2 42-49,53,58,60,66,71-72,81,85-93
+src/main/java/com/example/springai/chunking/StructureAwareSplitter.java
+  s_4e6ea50263c953::t_cd17b2bfb8b459 1-121
+docs/Day43-批量文档处理-异步任务与失败重试.md
+  s_f09a8065c3aaa3::t_b689727859dc67 1-552
+src/main/java/com/example/springai/chunking/SemanticChunkingSplitter.java
+  s_4e6ea50263c953::t_ec126a57c9f6f2 1-124
+src/main/java/com/example/springai/chunking/FixedSizeTextSplitter.java
+  s_4e6ea50263c953::t_0c2cb896447231 1-51
+app.log
+  s_3d55946efbadd1::t_d72518a8279482 151-159
+  s_3d55946efbadd1::t_f021994cd00c1d 148-150
+  s_3d55946efbadd1::t_84b942a7a69414 160
+  s_30bac1ee51f6ea::t_5d877bd2adde21 1-147
+src/main/java/com/example/springai/chunking/ChunkingStrategy.java
+  s_4e6ea50263c953::t_eea2142da473bc 1-38
+src/main/java/com/example/springai/chunking/ChunkingResult.java
+  s_4e6ea50263c953::t_0ceccc16775097 1-32
+src/main/java/com/example/springai/chunking/ChunkingService.java
+  s_4e6ea50263c953::t_ee1d57921ea649 1-113
+src/main/java/com/example/springai/controller/ChunkingController.java
+  s_4e6ea50263c953::t_c0fe07c2458823 1-65
+src/main/java/com/example/springai/service/RerankingService.java
+  s_276b71d8875415::t_66a8f3661d0526 4,10,16-20,26,28,31-32,44-48,79-113
+src/main/java/com/example/springai/chunking/RecursiveCharacterTextSplitter.java
+  s_4e6ea50263c953::t_5fc3d0d5f64b44 1-112
+src/main/java/com/example/springai/chunking/ParentChildChunkingService.java
+  s_4e6ea50263c953::t_97f5931d0afd7c 1-58
+src/test/java/com/example/springai/chunking/ChunkTest.java
+  s_276b71d8875415::t_6b101206a2ccc5 1-161,163-224
+  s_276b71d8875415::t_6d7df763caf2cf 162
+src/main/java/com/example/springai/service/ConfigurableRagService.java
+  s_276b71d8875415::t_c91c3ef98616c6 1-129
+.mvn/jvm.config
+  s_011d1b8c04b7e3::t_0c8f2e52684e57 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "e2adcf5340beeb5d39510f1cc858fd354e726799",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_011d1b8c04b7e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8da151a7-80a6-46b2-a8f8-1905a07c8c04",
+        "model": "unknown"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    },
+    "s_276b71d8875415": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a43b3fb8-8b23-4999-8d55-5efe6f8bcb3c",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    },
+    "s_30bac1ee51f6ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2d6b5072-9007-4640-b797-281fec6e75e4",
+        "model": "unknown"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    },
+    "s_3d55946efbadd1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "87c2301b-f688-4e0d-8fb2-671f1ad16444",
+        "model": "qwen3.7-plus"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    },
+    "s_4e6ea50263c953": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0733f2ae-de6c-4361-a190-bd25004eec83",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    },
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
