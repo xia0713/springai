@@ -1,0 +1,41 @@
+src/main/java/com/example/springai/controller/DocumentController.java
+  h_a118f437d6b52c 6,36,38,42,195-202,209-218,220
+  s_f09a8065c3aaa3::t_b254b569ff68b9 203-208
+  s_f09a8065c3aaa3::t_811d912ea8f17f 219
+docs/Day44-增量更新-向量更新与删除.md
+  s_f09a8065c3aaa3::t_429c49a421a417 1-502
+src/main/java/com/example/springai/service/DocumentRegistryService.java
+  s_f09a8065c3aaa3::t_906678be93897a 40-48
+  h_a118f437d6b52c 1-39,49-87
+src/main/java/com/example/springai/service/DocumentProcessingService.java
+  h_a118f437d6b52c 26,202-203,214-223,225-227,230-238
+  s_f09a8065c3aaa3::t_ff043d1177c567 208-211
+  s_f09a8065c3aaa3::t_ab1caa46f26cb2 48-49
+  s_f09a8065c3aaa3::t_956ffe1a3be2eb 224,228-229,239
+src/main/java/com/example/springai/service/DocumentManagementService.java
+  h_a118f437d6b52c 1-6,8-32,34-60,62-85
+  s_f09a8065c3aaa3::t_4f44dea5478217 33
+  s_f09a8065c3aaa3::t_ddff7ac4d99216 61
+  s_f09a8065c3aaa3::t_cbb5fbf26d3e25 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "5dab4e5e4bd70a2a56739c33212e9c42bbc9ce29",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "deepseek-v4-flash-vision-exp"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
