@@ -27,14 +27,17 @@ public class DocumentRegistryService {
                     file_hash   VARCHAR(128),
                     chunk_count INT DEFAULT 0,
                     create_time BIGINT,
-                    update_time BIGINT
+                    update_time BIGINT,
+                    owner       VARCHAR(100)          -- Day45: 归属用户
                 )
                 """);
+        // 迁移：老表若没有 owner 列就补上（幂等）
+        jdbc.execute("ALTER TABLE document_registry ADD COLUMN IF NOT EXISTS owner VARCHAR(100)");
     }
 
     /** 注册或更新一条文档记录（docId 相同则覆盖） */
     public void upsert(String docId, String filename, String category,
-                       String fileHash, int chunkCount) {
+                       String fileHash, int chunkCount, String owner) {
         long now = Instant.now().toEpochMilli();
         // 先查是否已有 create_time，有就保留，没有就用当前时间
         // ⚠️ queryForObject 查不到记录会抛 EmptyResultDataAccessException，必须捕获
@@ -50,15 +53,16 @@ public class DocumentRegistryService {
 
         jdbc.update("""
                 INSERT INTO document_registry
-                    (doc_id, filename, category, file_hash, chunk_count, create_time, update_time)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                    (doc_id, filename, category, file_hash, chunk_count, create_time, update_time, owner)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT (doc_id) DO UPDATE SET
                     filename = EXCLUDED.filename,
                     category = EXCLUDED.category,
                     file_hash = EXCLUDED.file_hash,
                     chunk_count = EXCLUDED.chunk_count,
-                    update_time = EXCLUDED.update_time
-                """, docId, filename, category, fileHash, chunkCount, ct, now);
+                    update_time = EXCLUDED.update_time,
+                    owner = EXCLUDED.owner
+                """, docId, filename, category, fileHash, chunkCount, ct, now, owner);
     }
 
     /** 按 docId 查 fileHash（更新时判断内容是否真的变了） */

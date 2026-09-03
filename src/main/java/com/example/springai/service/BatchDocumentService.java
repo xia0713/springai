@@ -31,7 +31,7 @@ public class BatchDocumentService {
      * 如果直接把 MultipartFile 传给异步线程，处理时文件早没了，报 FileNotFoundException。
      * 所以要在【请求线程内】先把文件 transferTo 到自己的临时目录，再把 Path 交给异步线程。
      */
-    public String submit(List<MultipartFile> files) throws IOException {
+    public String submit(List<MultipartFile> files, String owner) throws IOException {
         if (files == null || files.isEmpty()) {
             throw new IllegalArgumentException("至少上传一个文件");
         }
@@ -54,7 +54,7 @@ public class BatchDocumentService {
         }
 
         // 跨 Bean 调用，@Async 真正生效；立即返回，不等处理完
-        processor.processAsync(taskId, paths, names);
+        processor.processAsync(taskId, paths, names, owner);
 
         return taskId;
     }

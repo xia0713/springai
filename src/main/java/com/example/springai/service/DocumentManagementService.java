@@ -41,7 +41,7 @@ public class DocumentManagementService {
      * 1. 算新文件 fileHash，和旧注册表里的比；一样就跳过（省 token）
      * 2. 不一样 → 先删旧向量，再重灌 + 更新注册表
      */
-    public String updateDocument(String filename, MultipartFile file) throws Exception {
+    public String updateDocument(String filename, MultipartFile file, String owner) throws Exception {
         String category = filename.replaceAll("\\.[^.]+$", "");
         String docId = category + ":" + filename;
 
@@ -61,10 +61,10 @@ public class DocumentManagementService {
         vectorStore.delete(new FilterExpressionBuilder().eq("docId", docId).build());
 
         // 再灌新的（processAndStore 内部会重新解析+embedding+写入）
-        int chunks = processingService.processAndStore(tmp, filename);
+        int chunks = processingService.processAndStore(tmp, filename, owner);
 
         // 更新注册表
-        registryService.upsert(docId, filename, category, newHash, chunks);
+        registryService.upsert(docId, filename, category, newHash, chunks, owner);
 
         // 清理临时文件
         Files.deleteIfExists(tmp);

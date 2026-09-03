@@ -24,7 +24,7 @@ public class BatchDocumentProcessor {
      * 注意：这个 @Async 方法在独立 Bean 里，被 BatchDocumentService 跨 Bean 调用，代理才生效。
      */
     @Async("documentTaskExecutor")
-    public void processAsync(String taskId, List<Path> files, List<String> filenames) {
+    public void processAsync(String taskId, List<Path> files, List<String> filenames, String owner) {
         DocumentBatchTask task = taskStore.get(taskId);
 
         for (int i = 0; i < files.size(); i++) {
@@ -32,7 +32,7 @@ public class BatchDocumentProcessor {
             FileResult result;
             try {
                 // 内部自带 3 次重试，重试耗尽仍失败会抛异常
-                int chunks = processingService.processAndStore(files.get(i), name);
+                int chunks = processingService.processAndStore(files.get(i), name, owner);
                 result = new FileResult(name, true, chunks, null);
             } catch (Exception e) {
                 log.error("文件处理失败: {}", name, e);

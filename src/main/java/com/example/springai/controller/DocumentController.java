@@ -12,6 +12,8 @@ import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvi
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.filter.Filter;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -60,15 +62,19 @@ public class DocumentController {
 
 
     /**
-     * 批量上传：多文件，秒回 taskId
-     * 注意：这里要用 MultipartFile[] 或 List<MultipartFile> 接收多文件
+     * 批量上传：多文件，秒回 taskId。
+     * ⚠️ currentUser 仅演示用，生产从登录态拿。
      */
     @PostMapping("/batch/upload")
-    public Map<String, String> batchUpload(@RequestParam("files") List<MultipartFile> files) throws IOException {
-        String taskId = batchService.submit(files);
+    public Map<String, String> batchUpload(
+            @RequestParam("files") List<MultipartFile> files,
+            @RequestParam(required = false) String currentUser) throws IOException {
+        String owner = (currentUser == null || currentUser.isBlank()) ? "public" : currentUser;
+        String taskId = batchService.submit(files, owner);
         return Map.of(
                 "taskId", taskId,
                 "total", String.valueOf(files.size()),
+                "owner", owner,
                 "hint", "轮询 GET /api/documents/batch/" + taskId + " 查进度"
         );
     }
@@ -89,20 +95,35 @@ public class DocumentController {
 
 
     /**
-     * 相似度搜索，返回最相关的 Top3
+     * 相似度搜索，返回最相关的 Top3。
+     * Day45: 加 owner 权限过滤 —— 只能看到 owner==当前用户 或 public 的文档。
+     * ⚠️ currentUser 仅用于本地演示，生产必须从登录态/JWT 取，不能信任前端参数。
      */
     @GetMapping("/vector/search")
     public List<Map<String, Object>> search(
             @RequestParam String query,
-            @RequestParam String category,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String currentUser,
             @RequestParam(defaultValue = "3") Integer topK) {
+
+        // 权限过滤：无 currentUser 则只见 public 的文档
+        // ⚠️ and()/or() 要求 Op 类型，不能拿 build() 后的 Expression 去 and，全程用 Op 最后再 build
+        String owner = (currentUser == null || currentUser.isBlank()) ? "public" : currentUser;
+        FilterExpressionBuilder b = new FilterExpressionBuilder();
+        FilterExpressionBuilder.Op op = b.eq("owner", owner);
+
+        // 可选叠加 category 过滤：(owner==我) AND (category==x)
+        if (StringUtils.isNotBlank(category)) {
+            op = b.and(op, b.eq("category", category));
+        }
+        Filter.Expression filter = op.build();
 
         List<Document> results = vectorStore.similaritySearch(
                 SearchRequest.builder()
                         .query(query)
                         .topK(topK)
                         .similarityThreshold(0.6)              // 相似度阈值，低于此值不返回（默认 0.0，即全部返回）
-                        .filterExpression(StringUtils.isBlank(category)?null:"category == '"+category+"'")  // 元数据过滤表达式
+                        .filterExpression(filter)              // Day45: 类型安全 Filter（替代字符串拼接）
                         .build()
         );
 
@@ -120,10 +141,14 @@ public class DocumentController {
 
 
     @GetMapping("/ask")
-    public QaResponse ask(@RequestParam String query) {
-        // 就这一行！QuestionAnswerAdvisor 自动完成检索+生成
+    public QaResponse ask(
+            @RequestParam String query,
+            @RequestParam(required = false) String currentUser) {
+        // Day45: 问答也要按 owner 过滤（QuestionAnswerAdvisor 从 qa_filter_expression 读动态过滤）
+        String owner = (currentUser == null || currentUser.isBlank()) ? "public" : currentUser;
         String answer = ragChatClient.prompt()
                 .user(query)
+                .advisors(spec -> spec.param("qa_filter_expression", "owner == '" + owner + "'"))
                 .call()
                 .content();
         return new QaResponse(answer);
@@ -140,10 +165,13 @@ public class DocumentController {
 
 
     @GetMapping("/askWithSource")
-    public ChatAnswer askWithSource(String question) {
-        // ① 生成答案（Day 32 的 QuestionAnswerAdvisor 自动完成检索+生成）
+    public ChatAnswer askWithSource(String question,
+                                    @RequestParam(required = false) String currentUser) {
+        // ① 生成答案（QuestionAnswerAdvisor 自动完成检索+生成）
+        String owner = (currentUser == null || currentUser.isBlank()) ? "public" : currentUser;
         ChatResponse response = ragChatClient.prompt()
                 .user(question)
+                .advisors(spec -> spec.param("qa_filter_expression", "owner == '" + owner + "'"))
                 .call()
                 .chatResponse();
 
@@ -212,9 +240,12 @@ public class DocumentController {
 
     /** 更新文档：重新上传同一 docId，内容变了才先删后插 */
     @PutMapping("/update")
-    public Map<String, String> updateDocument(@RequestParam("file") MultipartFile file) throws Exception {
+    public Map<String, String> updateDocument(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(required = false) String currentUser) throws Exception {
         String filename = file.getOriginalFilename();
-        String result = managementService.updateDocument(filename, file);
+        String owner = (currentUser == null || currentUser.isBlank()) ? "public" : currentUser;
+        String result = managementService.updateDocument(filename, file, owner);
         return Map.of("result", result, "filename", filename);
     }
 

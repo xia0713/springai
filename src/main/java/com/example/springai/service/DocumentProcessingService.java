@@ -184,7 +184,7 @@ public class DocumentProcessingService {
             maxAttempts = 3,
             backoff = @Backoff(delay = 1000, multiplier = 2, maxDelay = 8000)
     )
-    public int processAndStore(Path file, String filename) throws Exception {
+    public int processAndStore(Path file, String filename, String owner) throws Exception {
         Resource resource = new FileSystemResource(file.toFile());
 
         // ① 解析（Tika）
@@ -200,14 +200,14 @@ public class DocumentProcessingService {
         // ④ 补元数据
         String category = filename != null ? filename.replaceAll("\\.[^.]+$", "") : "unknown";
         String fileHash = md5(file.toFile());            // 新增：内容指纹
-        docs = attachIdentity(docs, filename, category, fileHash);
+        docs = attachIdentity(docs, filename, category, fileHash, owner);
 
         // ⑤ 向量化入库
         vectorStore.add(docs);
 
         // ⑥ 同步注册表（docId 相同则覆盖，ON CONFLICT 幂等，重复重试无害）
         String docId = category + ":" + filename;
-        registryService.upsert(docId, filename, category, fileHash, docs.size());
+        registryService.upsert(docId, filename, category, fileHash, docs.size(), owner);
 
         return docs.size();   // 返回分块数，供进度明细展示
     }
@@ -217,13 +217,14 @@ public class DocumentProcessingService {
      * fileHash：内容指纹（不建议用 toHashCode，不同 JVM 可能不同），用 MD5 更稳，此处简化用 hashCode 演示
      * 注意：真正生产用 MD5/SHA-256，这里用 hashCode 只是演示「内容变化 hash 变」这个行为
      */
-    private List<Document> attachIdentity(List<Document> docs, String filename, String category, String fileHash) {
+    private List<Document> attachIdentity(List<Document> docs, String filename, String category, String fileHash, String owner) {
         String docId = category + ":" + filename;   // ✅ 稳定的逻辑ID，重传/改版都不变
         return docs.stream().map(d -> {
             d.getMetadata().put("docId", docId);     // 新增：身份锚点
             d.getMetadata().put("source", filename);
             d.getMetadata().put("category", category);
             d.getMetadata().put("fileHash", fileHash); // 新增：内容指纹，判断是否真变了
+            d.getMetadata().put("owner", owner == null ? "public" : owner);   // Day45: 归属，缺省 public
             d.getMetadata().put("createTime", System.currentTimeMillis());
             return d;
         }).toList();
