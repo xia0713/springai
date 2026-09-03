@@ -1,0 +1,44 @@
+docs/Day45-权限控制-多租户数据隔离.md
+  s_f09a8065c3aaa3::t_c7d8179e8500fe 1-352
+src/main/java/com/example/springai/service/DocumentRegistryService.java
+  s_f09a8065c3aaa3::t_67017666d7e4fa 30-31,34-35,40
+  s_f09a8065c3aaa3::t_c9e7bb19873668 56-57,63-65
+src/main/java/com/example/springai/service/BatchDocumentService.java
+  s_f09a8065c3aaa3::t_375ef87de41727 34,57
+src/main/java/com/example/springai/service/DocumentManagementService.java
+  s_f09a8065c3aaa3::t_3c434b95b8247c 44,64,67
+src/main/java/com/example/springai/service/DocumentProcessingService.java
+  s_f09a8065c3aaa3::t_d7b3265523bab3 187,203,210
+  s_f09a8065c3aaa3::t_7463b134af029e 220,227
+src/main/java/com/example/springai/component/BatchDocumentProcessor.java
+  s_f09a8065c3aaa3::t_e747d4a724cbc0 27,35
+src/main/java/com/example/springai/controller/DocumentController.java
+  s_f09a8065c3aaa3::t_3ee5f4cc37e456 243-245,247-248
+  s_f09a8065c3aaa3::t_e9bec52764bf22 15-16
+  s_f09a8065c3aaa3::t_fb32d564210cb4 168-171,174
+  s_f09a8065c3aaa3::t_c596cdf7718a40 144-148,151
+  s_f09a8065c3aaa3::t_648a14689005b0 110,113,117,119
+  s_f09a8065c3aaa3::t_572eac0cdd25df 98-100,105-106,109,111-112,114-116,118,120,126
+  s_f09a8065c3aaa3::t_f375e9150e6f11 65-66,69-73,77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "8a4a39ebbd8ba82652788e6c4bc6c8d757e906c7",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "deepseek-v4-flash-vision-exp"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
