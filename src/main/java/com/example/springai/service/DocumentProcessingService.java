@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -43,6 +44,8 @@ public class DocumentProcessingService {
             .withMinChunkLengthToEmbed(50)
             .withKeepSeparator(true)
             .build();
+
+    private final DocumentRegistryService registryService;
 
 
     /**
@@ -196,17 +199,42 @@ public class DocumentProcessingService {
 
         // ④ 补元数据
         String category = filename != null ? filename.replaceAll("\\.[^.]+$", "") : "unknown";
-        long createTime = System.currentTimeMillis();
-        docs = docs.stream().map(d -> {
-            d.getMetadata().put("source", filename);
-            d.getMetadata().put("category", category);
-            d.getMetadata().put("createTime", createTime);
-            return d;
-        }).toList();
+        String fileHash = md5(file.toFile());            // 新增：内容指纹
+        docs = attachIdentity(docs, filename, category, fileHash);
 
         // ⑤ 向量化入库
         vectorStore.add(docs);
 
+        // ⑥ 同步注册表（docId 相同则覆盖，ON CONFLICT 幂等，重复重试无害）
+        String docId = category + ":" + filename;
+        registryService.upsert(docId, filename, category, fileHash, docs.size());
+
         return docs.size();   // 返回分块数，供进度明细展示
+    }
+    /**
+     * 给文档补「身份元数据」。
+     * docId：逻辑身份（category + 文件名），跨版本稳定 → 删除/更新的锚点
+     * fileHash：内容指纹（不建议用 toHashCode，不同 JVM 可能不同），用 MD5 更稳，此处简化用 hashCode 演示
+     * 注意：真正生产用 MD5/SHA-256，这里用 hashCode 只是演示「内容变化 hash 变」这个行为
+     */
+    private List<Document> attachIdentity(List<Document> docs, String filename, String category, String fileHash) {
+        String docId = category + ":" + filename;   // ✅ 稳定的逻辑ID，重传/改版都不变
+        return docs.stream().map(d -> {
+            d.getMetadata().put("docId", docId);     // 新增：身份锚点
+            d.getMetadata().put("source", filename);
+            d.getMetadata().put("category", category);
+            d.getMetadata().put("fileHash", fileHash); // 新增：内容指纹，判断是否真变了
+            d.getMetadata().put("createTime", System.currentTimeMillis());
+            return d;
+        }).toList();
+    }
+    private String md5(File f) throws Exception {
+        byte[] bytes = java.nio.file.Files.readAllBytes(f.toPath());
+        byte[] digest = java.security.MessageDigest.getInstance("MD5").digest(bytes);
+        StringBuilder sb = new StringBuilder();
+        for (byte b : digest) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
     }
 }

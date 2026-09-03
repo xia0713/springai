@@ -3,6 +3,7 @@ package com.example.springai.controller;
 import com.example.springai.dto.ChatRequest;
 import com.example.springai.model.DocumentBatchTask;
 import com.example.springai.service.BatchDocumentService;
+import com.example.springai.service.DocumentManagementService;
 import com.example.springai.service.DocumentProcessingService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -32,11 +33,13 @@ public class DocumentController {
     private final DocumentProcessingService processingService;
     private final VectorStore vectorStore;
     private final BatchDocumentService batchService;   // 构造器里加这个依赖
+    private final DocumentManagementService managementService;   // 构造器追加
 
-    public DocumentController(DocumentProcessingService processingService, VectorStore vectorStore, BatchDocumentService batchService, ChatClient ragChatClient) {
+    public DocumentController(DocumentProcessingService processingService, VectorStore vectorStore, BatchDocumentService batchService, DocumentManagementService managementService, ChatClient ragChatClient) {
         this.processingService = processingService;
         this.vectorStore = vectorStore;
         this.batchService = batchService;
+        this.managementService = managementService;
         this.ragChatClient = ragChatClient;
     }
 
@@ -187,6 +190,32 @@ public class DocumentController {
             );
         }
         return new ArrayList<>(byFile.values());
+    }
+
+
+
+    /** 列出所有已注册文档 */
+    @GetMapping("/list")
+    public List<Map<String, Object>> listDocuments() {
+        return managementService.listAll();
+    }
+
+    /**
+     * 删除文档（按 docId）。
+     * 用 @RequestParam 接收，避免 docId 里含冒号/中文时路径编码报 400/404 的坑。
+     */
+    @DeleteMapping("/delete")
+    public Map<String, String> deleteDocument(@RequestParam("docId") String docId) {
+        managementService.deleteDocument(docId);
+        return Map.of("message", "deleted", "docId", docId);
+    }
+
+    /** 更新文档：重新上传同一 docId，内容变了才先删后插 */
+    @PutMapping("/update")
+    public Map<String, String> updateDocument(@RequestParam("file") MultipartFile file) throws Exception {
+        String filename = file.getOriginalFilename();
+        String result = managementService.updateDocument(filename, file);
+        return Map.of("result", result, "filename", filename);
     }
 
     // 提取文本片段的前 100 字作为摘要
