@@ -1,0 +1,48 @@
+src/main/java/com/example/springai/service/MultiRecallRagService.java
+  s_f09a8065c3aaa3::t_5c5903bd7e49de 113-167
+docs/Day47-效果评估-构建测试集量化评估.md
+  s_f09a8065c3aaa3::t_98a0a90c192379 1-268
+src/test/java/com/example/springai/evaluation/RagGenerationEval.java
+  s_f09a8065c3aaa3::t_493cdbfb157c21 1-104
+src/main/java/com/example/springai/controller/RagDebugController.java
+  s_f09a8065c3aaa3::t_e4eebee43818b5 1-33
+docs/Day48-第7周收官-知识库效果评估报告与复盘.md
+  s_f09a8065c3aaa3::t_d407df64734aed 1-180
+src/test/java/com/example/springai/chunking/RagTestCorpus.java
+  s_276b71d8875415::t_d9bbcc2d76224f 144,146
+  s_276b71d8875415::t_e4cc504b704dce 1-119,121,123-143,145,147-148
+  s_276b71d8875415::t_845a7b36a7bf83 120,122
+docs/Day46-常见问题排查-检索不到与答案不准.md
+  s_f09a8065c3aaa3::t_750f20379f952c 1-251
+docs/Day49-第7周过关自检与第二阶段小结.md
+  s_f09a8065c3aaa3::t_5407e0aa848687 1-172
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "dc806e14eaed2541a2516a329736f719e3daf1cc",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_276b71d8875415": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a43b3fb8-8b23-4999-8d55-5efe6f8bcb3c",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    },
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
