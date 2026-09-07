@@ -110,5 +110,60 @@ public class MultiRecallRagService {
                 .call()
                 .content();
     }
+
+    /**
+     * Day46/49: 召回调试 —— 暴露每一步的中间结果，供排查「检索不到/答案不准」时定位。
+     * <p>
+     * 返回结构：query / rewrittenQueries / hybridRecall(原始混合召回) / finalTop(完整 retrieve 重排后 top5)。
+     * 注意：finalTop 走完整 retrieve()，内部会再跑一次查询改写与混合检索，有重复 LLM 调用，
+     * 但 debug 接口非高频，准确性优先于性能。
+     */
+    public Map<String, Object> debugRetrieve(String question) {
+        Map<String, Object> debug = new LinkedHashMap<>();
+        debug.put("query", question);
+
+        // ① 查询改写结果
+        try {
+            debug.put("rewrittenQueries", rewriter.rewrite(question));
+        } catch (Exception e) {
+            debug.put("rewrittenQueries", "改写失败: " + e.getMessage());
+        }
+
+        // ② 混合检索原始召回（含 BM25 的 rrf 分数）
+        try {
+            List<Document> rawHybrid = hybridSearch.hybridSearch(question);
+            debug.put("hybridRecallCount", rawHybrid.size());
+            debug.put("hybridRecall", rawHybrid.stream().map(d -> Map.of(
+                    "text", snippet(d.getText()),
+                    "rrfScore", d.getMetadata().getOrDefault("rrf_score", "?"),
+                    "factId", d.getMetadata().getOrDefault("factId", "?")
+            )).toList());
+        } catch (Exception e) {
+            debug.put("hybridRecallCount", "混合检索失败: " + e.getMessage());
+        }
+
+        // ③ 完整 retrieve 的最终 top5（含重排分数、来源、factId）
+        try {
+            List<Document> top = retrieve(question);
+            debug.put("finalTopCount", top.size());
+            debug.put("finalTop", top.stream().map(d -> Map.of(
+                    "text", snippet(d.getText()),
+                    "score", d.getMetadata().getOrDefault("rerank_score",
+                            d.getMetadata().getOrDefault("distance", "?")),
+                    "factId", d.getMetadata().getOrDefault("factId", "?"),
+                    "source", d.getMetadata().getOrDefault("source", "?")
+            )).toList());
+        } catch (Exception e) {
+            debug.put("finalTopCount", "检索失败: " + e.getMessage());
+        }
+
+        return debug;
+    }
+
+    /** 截断文本用于 debug 展示，避免超长内容刷屏 */
+    private String snippet(String text) {
+        if (text == null) return "";
+        return text.length() > 120 ? text.substring(0, 120) + "..." : text;
+    }
 }
 
