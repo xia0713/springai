@@ -1,0 +1,30 @@
+docs/Day50-FunctionCalling原理与Tool注解.md
+  s_f09a8065c3aaa3::t_d7380bdf39c596 1-265
+src/main/java/com/example/springai/tool/WeatherTool.java
+  s_f09a8065c3aaa3::t_2bfd32e5fa5f71 1-29
+src/main/java/com/example/springai/controller/FunctionCallingController.java
+  s_f09a8065c3aaa3::t_144d6b31460b25 1-44
+docs/Day51-多工具编排-自动选择与异常降级.md
+  s_f09a8065c3aaa3::t_fb1464642845bf 1-376
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "720502255a27267b0b2518541c628ddd8ec03cbd",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
