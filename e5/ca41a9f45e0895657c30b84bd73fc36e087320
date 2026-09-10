@@ -1,0 +1,37 @@
+src/main/resources/application.yaml
+  s_f09a8065c3aaa3::t_d246c27f77d119 69-72
+docs/Day54-复杂流程编排-报表生成全链路.md
+  s_f09a8065c3aaa3::t_706137ae81d09d 1-353
+src/main/java/com/example/springai/config/ToolConfig.java
+  s_f09a8065c3aaa3::t_5899782ca1442b 3,6,11,29-37
+  s_f09a8065c3aaa3::t_cd999212d61d57 38
+docs/Day53-对接现有业务API接口.md
+  s_f09a8065c3aaa3::t_7f4d88b171dbda 1-430
+src/main/java/com/example/springai/controller/MockErpController.java
+  s_f09a8065c3aaa3::t_58cedf5afc28d8 1-80
+src/main/java/com/example/springai/controller/ErpAssistantController.java
+  s_f09a8065c3aaa3::t_36b2bddede4a7e 1-33
+src/main/java/com/example/springai/tool/ErpEmployeeTool.java
+  s_f09a8065c3aaa3::t_c2b022ea0749c1 1-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "e5ca41a9f45e0895657c30b84bd73fc36e087320",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
