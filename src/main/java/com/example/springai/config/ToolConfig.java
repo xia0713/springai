@@ -1,12 +1,14 @@
 package com.example.springai.config;
 
+import com.example.springai.tool.ErpEmployeeTool;
 import org.springframework.ai.tool.execution.DefaultToolExecutionExceptionProcessor;
 import org.springframework.ai.tool.execution.ToolExecutionExceptionProcessor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 工具调用配置（Day51）。
+ * 工具调用配置（Day51/53）。
  */
 @Configuration
 public class ToolConfig {
@@ -23,5 +25,15 @@ public class ToolConfig {
         return DefaultToolExecutionExceptionProcessor.builder()
                 .alwaysThrow(false)
                 .build();
+    }
+
+    /**
+     * ERP 员工查询工具（Day53）。
+     * 带 @Value 构造参数（base-url / api-key），需显式声明为 Bean。
+     */
+    @Bean
+    public ErpEmployeeTool erpEmployeeTool(@Value("${app.erp.base-url}") String baseUrl,
+                                           @Value("${app.erp.api-key}") String apiKey) {
+        return new ErpEmployeeTool(baseUrl, apiKey);
     }
 }

@@ -66,6 +66,10 @@ app:
   embedding:
     base-url: https://www.micuapi.ai
     api-key: sk-LQKMaAjMTlyRxutKOHMC7OF0e3CoXfog46V1hxmRYq7z1xWw
+  # 模拟 ERP 接口（Day53 对接现有业务 API 演示）
+  erp:
+    base-url: http://localhost:8080
+    api-key: demo-key-123
 
 # ========== 日志配置 ==========
 logging:
