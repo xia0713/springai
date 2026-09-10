@@ -1,0 +1,43 @@
+docs/Day52-NL2SQL自然语言查数据.md
+  s_f09a8065c3aaa3::t_bdfa9cc0037a9e 1-368
+src/main/java/com/example/springai/config/DemoDataConfig.java
+  s_f09a8065c3aaa3::t_8c5abc4a14d44d 1-55
+src/main/java/com/example/springai/config/ToolConfig.java
+  s_f09a8065c3aaa3::t_fb48ec2deb695f 1-23,25-27
+  h_a118f437d6b52c 24
+src/main/java/com/example/springai/controller/Nl2SqlController.java
+  s_f09a8065c3aaa3::t_842e86846f76cd 1-64
+src/main/java/com/example/springai/tool/OrderTool.java
+  s_f09a8065c3aaa3::t_bbe0ee2d262757 1-33
+src/main/java/com/example/springai/tool/NotificationTool.java
+  s_f09a8065c3aaa3::t_bfbee70f1b2755 1-40
+src/main/java/com/example/springai/tool/SqlSafetyValidator.java
+  s_f09a8065c3aaa3::t_febb214a2329a7 1-36
+src/main/java/com/example/springai/tool/SqlQueryTool.java
+  s_f09a8065c3aaa3::t_83d1d420a65395 1-53
+src/main/java/com/example/springai/controller/AssistantController.java
+  s_f09a8065c3aaa3::t_ae9d4074e05a86 1-42
+src/main/java/com/example/springai/tool/CalculatorTool.java
+  s_f09a8065c3aaa3::t_1c78b4afb1ed58 1-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "6cd4583147c3967357c9a0950b7e90da724f9179",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
