@@ -1,0 +1,32 @@
+docs/Day59-Agent记忆体系-短期与长期记忆.md
+  s_f09a8065c3aaa3::t_866558d1cd591c 1-252,260-265,267-278
+  s_f09a8065c3aaa3::t_06a69282da974c 253-259,266
+src/main/java/com/example/springai/tool/MemoryTool.java
+  s_f09a8065c3aaa3::t_4ab5dc1cd76f6e 1-72
+src/main/java/com/example/springai/controller/MemoryAgentController.java
+  s_f09a8065c3aaa3::t_0a0daaf343d171 4-7,10,12-15,22-24,28,30-36,41-47,49-51,54-56,64-86
+  s_f09a8065c3aaa3::t_52072f15fdd7e6 1-3,8-9,11,16-21,25-27,29,37-40,48,52-53,57-63,87-89
+src/main/java/com/example/springai/config/MemoryConfig.java
+  s_f09a8065c3aaa3::t_058eaa42aa4fd3 1-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "fdd82082e36b2960dbffab3daf2d1572a13a7e41",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
