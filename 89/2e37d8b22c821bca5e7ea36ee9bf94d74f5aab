@@ -1,0 +1,31 @@
+src/main/java/com/example/springai/tool/OpsTools.java
+  s_f09a8065c3aaa3::t_c879bfb02211b4 1-58
+src/main/java/com/example/springai/controller/OpsAgentController.java
+  s_f09a8065c3aaa3::t_da1e4dc46908d7 1-49
+docs/Day60-运维排障Agent-行业知识注入与评估.md
+  s_f09a8065c3aaa3::t_680183c5b9ba38 1-231
+src/main/java/com/example/springai/agent/SimpleReActAgent.java
+  s_f09a8065c3aaa3::t_6499133d99442e 37,39,48-55,62-63
+  s_f09a8065c3aaa3::t_8deac7d840a388 68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "892e37d8b22c821bca5e7ea36ee9bf94d74f5aab",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
