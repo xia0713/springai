@@ -34,8 +34,9 @@ public class SimpleReActAgent {
     private final ChatModel chatModel;
     private final ToolCallingManager toolCallingManager;
     private final List<ToolCallback> toolCallbacks;
+    private final String systemPrompt;   // Day60: 可定制 —— 行业知识注入方式②（排障 SOP 等）
 
-    private static final String SYSTEM_PROMPT = """
+    private static final String DEFAULT_SYSTEM_PROMPT = """
             你是一个能干活的任务代理。面对复杂任务：
             1. 先想清楚需要哪几步（可以先用一两句话说明思路）
             2. 逐步调用工具完成，每一步根据上一步结果决定下一步
@@ -44,17 +45,27 @@ public class SimpleReActAgent {
             """;
 
     public SimpleReActAgent(ChatModel chatModel, Object... toolObjects) {
+        this(chatModel, null, toolObjects);
+    }
+
+    /**
+     * Day60 新增：允许为不同场景注入定制 system prompt（如运维排障 SOP）。
+     * systemPrompt 传 null 时用默认通用版。
+     */
+    public SimpleReActAgent(ChatModel chatModel, String systemPrompt, Object... toolObjects) {
         this.chatModel = chatModel;
         this.toolCallingManager = ToolCallingManager.builder().build();
         MethodToolCallbackProvider provider = MethodToolCallbackProvider.builder()
                 .toolObjects(toolObjects)
                 .build();
         this.toolCallbacks = Arrays.asList(provider.getToolCallbacks());
+        this.systemPrompt = (systemPrompt == null || systemPrompt.isBlank())
+                ? DEFAULT_SYSTEM_PROMPT : systemPrompt;
     }
 
     public AgentResult run(String task) {
         List<Message> conversation = new ArrayList<>(List.of(
-                new SystemMessage(SYSTEM_PROMPT),
+                new SystemMessage(systemPrompt),
                 new UserMessage(task)));
 
         ChatOptions options = ToolCallingChatOptions.builder()
