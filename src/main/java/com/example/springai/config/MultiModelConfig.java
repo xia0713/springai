@@ -33,7 +33,7 @@ public class MultiModelConfig {
      */
     @Bean
     public ChatClient qwenChatClient() {
-        return buildChatClient("qwen3.7-plus");
+        return buildChatClient("qwen3.8-27b");
     }
 
     private ChatClient buildChatClient(String model) {

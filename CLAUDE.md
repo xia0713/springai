@@ -43,7 +43,7 @@ The controller uses a hardcoded prompt template that prepends system instruction
 **application.yaml** - Key configuration:
 - `spring.ai.openai.base-url`: Points to `https://ai-gateway.ztn.cn` (third-party relay platform)
 - `spring.ai.openai.api-key`: API key for the relay platform (environment variable `OPENAI_API_KEY` recommended for production)
-- `spring.ai.openai.chat.options.model`: Uses `qwen3.7-plus` model
+- `spring.ai.openai.chat.options.model`: Uses `qwen3.8-27b` model
 - `spring.ai.openai.chat.options.temperature`: Set to 0.7 (adjust per use case: 0.1-0.3 for code/extraction, 0.7-0.9 for creative tasks)
 
 ### Maven Repository Configuration

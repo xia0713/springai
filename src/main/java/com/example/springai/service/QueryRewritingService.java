@@ -16,7 +16,7 @@ import java.util.Map;
  * 查询改写---Multi-Query 改写。
  * <p>
  * 直接调用网关（不走 Spring AI ChatClient）：Spring AI 1.0.3 的 OpenAI 选项
- * 无法透传 {@code enable_thinking} 参数，而 qwen3.7-plus 默认开启思考模式，
+ * 无法透传 {@code enable_thinking} 参数，而 qwen3.8-27b 默认开启思考模式，
  * 每次改写要 40s+；显式关闭后仅 ~5s。
  */
 @Service
@@ -30,7 +30,7 @@ public class QueryRewritingService {
     public QueryRewritingService(
             @Value("${spring.ai.openai.base-url}") String baseUrl,
             @Value("${spring.ai.openai.api-key}") String apiKey,
-            @Value("${spring.ai.openai.chat.options.model:qwen3.7-plus}") String model,
+            @Value("${spring.ai.openai.chat.options.model:qwen3.8-27b}") String model,
             ObjectMapper objectMapper) {
         this.apiKey = apiKey;
         this.model = model;

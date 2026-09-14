@@ -36,4 +36,13 @@ public class ToolConfig {
                                            @Value("${app.erp.api-key}") String apiKey) {
         return new ErpEmployeeTool(baseUrl, apiKey);
     }
+
+    /**
+     * 报表流程工具集（Day54）：查数据 → 存草稿 → 发邮件。
+     * 需要 JdbcTemplate 做销售统计查询。
+     */
+    @Bean
+    public com.example.springai.tool.ReportFlowTools reportFlowTools(org.springframework.jdbc.core.JdbcTemplate jdbc) {
+        return new com.example.springai.tool.ReportFlowTools(jdbc);
+    }
 }
