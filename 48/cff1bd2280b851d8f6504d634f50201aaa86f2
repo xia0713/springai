@@ -1,0 +1,26 @@
+src/main/java/com/example/springai/controller/MultiAgentController.java
+  s_f09a8065c3aaa3::t_3c190cf419698a 1-92
+docs/Day61-多Agent协作-角色分工与结构化交接.md
+  s_f09a8065c3aaa3::t_74af8f5ac821cd 1-222
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "48cff1bd2280b851d8f6504d634f50201aaa86f2",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
