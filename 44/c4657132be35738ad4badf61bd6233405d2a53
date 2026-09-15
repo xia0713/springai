@@ -1,0 +1,34 @@
+src/main/java/com/example/springai/controller/ReActAgentController.java
+  s_f09a8065c3aaa3::t_c5b0fd518a67ce 5,19,23,30,36,44,49-58
+  s_f09a8065c3aaa3::t_3c0a1343dbe06f 59-60
+src/main/java/com/example/springai/agent/AgentResult.java
+  s_f09a8065c3aaa3::t_ea024487aa583b 4-5,7-13,16,20-26
+docs/Day62-Agent异常熔断与人工介入.md
+  s_f09a8065c3aaa3::t_db4883422e4822 1-314
+src/main/java/com/example/springai/agent/SimpleReActAgent.java
+  s_f09a8065c3aaa3::t_d6f621d258c03c 19,22,24,27-33,39-40,75,89-92,94-101,109-123,129-148,151,155-169
+  s_f09a8065c3aaa3::t_996b20d4a6f84f 170
+src/main/java/com/example/springai/tool/LoopDemoTool.java
+  s_f09a8065c3aaa3::t_86fceab00f5c73 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "44c4657132be35738ad4badf61bd6233405d2a53",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
