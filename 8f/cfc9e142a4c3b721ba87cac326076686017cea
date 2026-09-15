@@ -1,0 +1,28 @@
+docs/Day63-第9周收官-智能助手合体与复盘.md
+  s_f09a8065c3aaa3::t_ac1ae8579c5620 1-232
+src/main/java/com/example/springai/controller/SmartAssistantController.java
+  s_f09a8065c3aaa3::t_782c2ca3ad2933 1-88
+src/main/java/com/example/springai/agent/SimpleReActAgent.java
+  s_f09a8065c3aaa3::t_68a36da6cf6d11 75-83,85-88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "8fcfc9e142a4c3b721ba87cac326076686017cea",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
