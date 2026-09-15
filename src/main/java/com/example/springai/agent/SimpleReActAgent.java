@@ -72,10 +72,20 @@ public class SimpleReActAgent {
     }
 
     public AgentResult run(String task) {
+        return run(task, List.of());
+    }
+
+    /**
+     * Day63: 支持注入会话历史（短期记忆）。
+     * priorHistory 是【过去的】对话消息，会被原样带进 ReAct 循环
+     * （内部循环用 conversationHistory() 重建 Prompt 时自动保留这些消息）。
+     */
+    public AgentResult run(String task, List<Message> priorHistory) {
         long start = System.currentTimeMillis();
-        List<Message> conversation = new ArrayList<>(List.of(
-                new SystemMessage(systemPrompt),
-                new UserMessage(task)));
+        List<Message> conversation = new ArrayList<>();
+        conversation.add(new SystemMessage(systemPrompt));
+        conversation.addAll(priorHistory);
+        conversation.add(new UserMessage(task));
 
         ChatOptions options = ToolCallingChatOptions.builder()
                 .toolCallbacks(toolCallbacks)
