@@ -1,0 +1,28 @@
+docs/Day66-RPA与数据分析助手-行业黄金场景.md
+  s_f09a8065c3aaa3::t_a3cabe9cd641e6 1-144
+docs/Day67-行业AI落地差异-合规数据安全与选型.md
+  s_f09a8065c3aaa3::t_b5ea2b9f1a2723 1-131
+docs/Day65-内容生成与审核-架构设计与判断力.md
+  s_f09a8065c3aaa3::t_51678fc8d81f6c 1-147
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "3dfb37988401e5ef1c02400cfa904108bd61a97e",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
