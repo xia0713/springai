@@ -1,0 +1,24 @@
+docs/Day64-智能客服与知识库-架构成本与ROI.md
+  s_f09a8065c3aaa3::t_47abed7395b544 1-155
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "a9a295da9d6f629a7380ae576450214cb2d4d253",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
