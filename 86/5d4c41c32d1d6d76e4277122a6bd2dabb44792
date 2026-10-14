@@ -1,0 +1,41 @@
+src/main/java/com/example/springai/controller/ResilienceDemoController.java
+  h_a118f437d6b52c 1-46
+src/main/resources/application.yaml
+  h_a118f437d6b52c 82-99
+  s_f09a8065c3aaa3::t_91addb351f1d42 81
+docs/Day71-稳定性治理-熔断降级与多模型路由.md
+  s_f09a8065c3aaa3::t_7efeb2ac8ba73c 1-3,5,7-11,13-14,17-19,21,25-28,38,40,51,53,64,69,72,79,81,84,92-93,95,102,105,107,109,111,114-117,119-122,124-129,132,134-135,137-139,141,147-149,153-159,162-170,172,175-178,182,185-191,198-199,201-202,204-206,208-210,213,221-242,244-260,262-264,266-267,269-272,275-279,281-284,286-288,290,293-295,299,301,305,307-312,318-322,330-340
+  s_f09a8065c3aaa3::t_3cb70b8cb39f7b 4,6,15,20,22-24,29-37,39,41,43,46,48-49,52,54-60,62-63,65-68,73-78,80,82,85-91,94,96-101,103-104,106,108,110,112-113,118,123,130-131,133,136,140,142-145,150-152,160-161,171,173-174,180-181,183-184,192-197,200,203,207,212,214-220,243,265,273-274,296-297,300,302-304,313,323,328
+  s_f09a8065c3aaa3::t_eece1d1934229c 12,16,42,44-45,47,50,61,70-71,83,146,179,211,261,268,280,285,289,291-292,298,306,314-317,324-327,329,341
+docs/Day72-成本优化-缓存策略与模型分层路由.md
+  s_f09a8065c3aaa3::t_86f5b5b0562fc7 1-296
+pom.xml
+  h_a118f437d6b52c 167-172
+src/main/java/com/example/springai/service/ResilientChatService.java
+  h_a118f437d6b52c 1-56
+src/main/java/com/example/springai/service/CostOptimizedChatService.java
+  s_f09a8065c3aaa3::t_51f90b1ed35137 1-122
+src/main/java/com/example/springai/controller/CostDemoController.java
+  s_f09a8065c3aaa3::t_660c3c9d5d6c82 1-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "865d4c41c32d1d6d76e4277122a6bd2dabb44792",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
