@@ -79,3 +79,21 @@ logging:
     # 开启 HTTP 请求日志，排查 404 问题
     org.apache.hc.client5: DEBUG
     reactor.netty.http.client: DEBUG
+
+# 顶层配置（与 spring: 平级）
+resilience4j:
+  circuitbreaker:
+    instances:
+      llm:                                    # 熔断实例名，与注解 name 对应
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10               # 统计最近 10 次调用
+        minimum-number-of-calls: 5            # 至少 5 次才判定（防单次抖动误熔断）
+        failure-rate-threshold: 50            # 失败率 ≥50% → OPEN
+        wait-duration-in-open-state: 10s      # OPEN 持续 10s → HALF_OPEN
+        permitted-number-of-calls-in-half-open-state: 3
+  ratelimiter:
+    instances:
+      llm:
+        limit-for-period: 20                  # 每周期最多 20 次
+        limit-refresh-period: 1s              # 周期 1 秒
+        timeout-duration: 500ms               # 拿不到许可快速失败（交互场景）

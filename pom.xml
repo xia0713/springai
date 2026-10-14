@@ -164,6 +164,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
+        <!-- Resilience4j：熔断/限流（Boot 3.x 用 spring-boot3 后缀；版本解析失败就查中央仓库最新 2.x） -->
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot3</artifactId>
+            <version>2.2.0</version>
+        </dependency>
     </dependencies>
     <!-- Maven Central 直连，绕过 alimaven 镜像（阿里云未同步 Spring AI 1.0.3） -->
     <repositories>
