@@ -70,6 +70,9 @@ app:
   erp:
     base-url: http://localhost:8080
     api-key: demo-key-123
+  # AI 能力网关（Day73）：业务系统接入凭证
+  ai-gateway:
+    api-key: demo-ai-key-456
 
 # ========== 日志配置 ==========
 logging:
