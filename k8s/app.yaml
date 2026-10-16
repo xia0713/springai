@@ -1,0 +1,105 @@
+# Day75：AI 知识库应用 K8s 编排（五对象：Secret/ConfigMap/Deployment/Service/HPA）
+# 部署：kubectl apply -f k8s/app.yaml（镜像地址需替换为你的仓库）
+# 校验（无集群）：kubectl apply -f k8s/app.yaml --dry-run=client
+
+# ===== 1. Secret：敏感配置（生产用 sealed-secrets/vault，演示用明文）=====
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ai-app-secret
+type: Opaque
+stringData:
+  SPRING_DATASOURCE_PASSWORD: "xia0713"
+  SPRING_AI_OPENAI_API_KEY: "sk-RtUONsbppcygBmXyRI56E1evZVh9sqhAwYtphlK0Jxjey2tv"
+  APP_AI_GATEWAY_API_KEY: "demo-ai-key-456"
+---
+# ===== 2. ConfigMap：非敏感配置（Spring 环境变量覆盖，12-factor）=====
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-app-config
+data:
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/ai_db"
+  SPRING_DATASOURCE_USERNAME: "postgres"
+  SPRING_AI_OPENAI_BASE_URL: "https://ai-gateway.ztn.cn"
+  # 连接池乘法账（Day75 1.4）：每副本 10 × maxReplicas 6 = 60 ≤ PG max_connections
+  SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "10"
+---
+# ===== 3. Deployment：2 副本 + 探针 + 资源限额 =====
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-knowledge-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ai-knowledge-app
+  template:
+    metadata:
+      labels:
+        app: ai-knowledge-app
+    spec:
+      containers:
+        - name: app
+          image: your-registry/ai-knowledge-app:1.0.0   # 替换为你的镜像仓库地址
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: ai-app-config
+            - secretRef:
+                name: ai-app-secret
+          resources:
+            requests:
+              memory: "768Mi"
+              cpu: "500m"
+            limits:
+              memory: "1.5Gi"
+              cpu: "1000m"
+          # 探针语义分清（Day75 1.3）：liveness 只判活，readiness 判流量
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 60      # Spring 启动慢，给足预热（太短=CrashLoopBackOff）
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 40
+            periodSeconds: 5
+---
+# ===== 4. Service：副本的稳定入口 =====
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-knowledge-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: ai-knowledge-app
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+# ===== 5. HPA：按 CPU 自动水平扩展（过关标准的核心）=====
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ai-knowledge-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ai-knowledge-app
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

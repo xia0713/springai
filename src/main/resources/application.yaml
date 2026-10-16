@@ -5,6 +5,10 @@ spring:
   application:
     name: SpringAI
 
+  threads:
+    virtual:
+      enabled: true           # Day74: 请求处理层虚拟线程（50 并发不占死平台线程）
+
   servlet:
     multipart:
       max-file-size: 20MB              # 允许上传较大图片
@@ -15,6 +19,9 @@ spring:
     username: postgres
     password: xia0713
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20   # Day74: 默认 10 是 50 并发的隐形杀手（部署前算乘法：20×副本数≤PG上限）
+      connection-timeout: 3000 # 3 秒拿不到连接快速失败，别挂 30s
 
   ai:
     # 向量存储配置
@@ -100,3 +107,14 @@ resilience4j:
         limit-for-period: 20                  # 每周期最多 20 次
         limit-refresh-period: 1s              # 周期 1 秒
         timeout-duration: 500ms               # 拿不到许可快速失败（交互场景）
+
+# ========== K8s 健康探针（Day75）==========
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true     # 开启 /actuator/health/liveness 和 /actuator/health/readiness
