@@ -1,0 +1,38 @@
+k8s/app.yaml
+  s_f09a8065c3aaa3::t_b012a28fd7380e 1-105
+src/main/resources/application.yaml
+  s_f09a8065c3aaa3::t_e5d4a7db54e638 8-11
+  s_f09a8065c3aaa3::t_99ec379c5165cc 22-24
+  s_f09a8065c3aaa3::t_b06cb9e4fa85dc 109-120
+docs/Day74-并发性能优化-压测与向量索引.md
+  s_f09a8065c3aaa3::t_753db89124f9b3 1-209
+Dockerfile
+  s_f09a8065c3aaa3::t_5995ebc1eee4fb 1-20
+pom.xml
+  s_f09a8065c3aaa3::t_7c758d98042c2f 173-177
+docs/Day75-分布式部署-无状态化与K8s编排.md
+  s_f09a8065c3aaa3::t_ae6e650ac776ae 1-288
+docs/Day74-压测报告.md
+  s_f09a8065c3aaa3::t_39e73365ec1203 1-99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "5acc98fed30f1fff166a69c0050c09725d02b9fa",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
