@@ -80,6 +80,10 @@ app:
   # AI 能力网关（Day73）：业务系统接入凭证
   ai-gateway:
     api-key: demo-ai-key-456
+  # 提示词灰度（Day76）：比例运行时可调（POST /api/prompt-gray/percent?p=0 即秒级回滚）
+  prompt-gray:
+    percent: 30            # 30% 用户进 v2（hash(userId)%100 < 30）
+    default-version: v1
 
 # ========== 日志配置 ==========
 logging:
