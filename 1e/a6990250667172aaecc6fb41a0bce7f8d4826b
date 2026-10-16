@@ -1,0 +1,26 @@
+docs/Day77-第11周收官-生产级落地规范.md
+  s_f09a8065c3aaa3::t_78383310055ad8 1-166
+docs/AI应用生产级落地规范.md
+  s_f09a8065c3aaa3::t_a9e4ca70cc2390 1-166
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "1ea6990250667172aaecc6fb41a0bce7f8d4826b",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
