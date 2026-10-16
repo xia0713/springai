@@ -1,0 +1,30 @@
+src/main/java/com/example/springai/controller/PromptGrayController.java
+  s_f09a8065c3aaa3::t_2c8eadd34473da 1-42
+docs/Day76-灰度发布-提示词多版本与秒级回滚.md
+  s_f09a8065c3aaa3::t_f2413ab0dfeedc 1-319
+src/main/resources/application.yaml
+  s_f09a8065c3aaa3::t_6e1198eeaa11e8 83-86
+src/main/java/com/example/springai/service/PromptGrayService.java
+  s_f09a8065c3aaa3::t_04439c40a12be8 1-113
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "6a00561802262d0d9cc3131c73a96a17da78048f",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
