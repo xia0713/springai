@@ -1,0 +1,46 @@
+monitoring/docker-compose.yml
+  s_f09a8065c3aaa3::t_c5d1085e02fb93 5,19-22
+  s_f09a8065c3aaa3::t_8cb9b57f194eb3 1-4,6-18
+monitoring/grafana/provisioning/datasources/datasource.yml
+  s_f09a8065c3aaa3::t_67db5862b1132d 1-8
+monitoring/grafana/provisioning/dashboards/dashboards.yml
+  s_f09a8065c3aaa3::t_d7bd926dd1964f 1-9
+monitoring/grafana/dashboards/ai-dashboard.json
+  s_f09a8065c3aaa3::t_9b094ab87817a5 1-88
+src/main/java/com/example/springai/service/CostOptimizedChatService.java
+  s_f09a8065c3aaa3::t_a2ad8cd68825b7 3-6,18,20-23,25-27,38-44,51-52,55-76,80,88-89,97,100,102,104,107-108,124,142,145-148
+docs/Day78-监控指标-Prometheus与Grafana大盘.md
+  s_f09a8065c3aaa3::t_bbed27f37c51c8 1-254
+docs/Day79-日志与链路追踪-traceId贯穿全链路.md
+  s_f09a8065c3aaa3::t_03a5c368b49dbc 1-198
+monitoring/prometheus.yml
+  s_f09a8065c3aaa3::t_476a4301cb0789 1-9
+pom.xml
+  s_f09a8065c3aaa3::t_11af00e30e1b5e 183-192
+  s_f09a8065c3aaa3::t_c385c41bdada43 178-182
+src/main/resources/application.yaml
+  s_f09a8065c3aaa3::t_9c1098cd653ac7 126
+  s_f09a8065c3aaa3::t_2b4ab21f39fa1f 118,120-122
+  s_f09a8065c3aaa3::t_ba9bda54606ac8 90-92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "8f8cfb0b7edea54f32b7ddf9d296373799ce508d",
+  "prompts": {},
+  "humans": {
+    "h_a118f437d6b52c": {
+      "author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  },
+  "sessions": {
+    "s_f09a8065c3aaa3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "624c9041-e298-4b34-85a3-edf681db835e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "zt23006 <xiaweichao@yunexpress.cn>"
+    }
+  }
+}
