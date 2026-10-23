@@ -1,0 +1,9 @@
+# Grafana 大盘自动装配（Day78）：扫描 /var/lib/grafana/dashboards 下的 JSON
+apiVersion: 1
+providers:
+  - name: ai-app
+    folder: AI 应用
+    type: file
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards

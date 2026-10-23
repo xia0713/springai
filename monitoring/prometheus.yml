@@ -1,0 +1,9 @@
+# Day78：Prometheus 抓取配置
+# host.docker.internal = 容器内访问宿主机（Windows/Mac）
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: ai-app
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["host.docker.internal:8080"]

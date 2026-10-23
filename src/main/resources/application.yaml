@@ -87,6 +87,9 @@ app:
 
 # ========== 日志配置 ==========
 logging:
+  pattern:
+    # Day79: traceId/spanId 自动进每行日志（MDC），grep 一个 ID 还原全链路
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}] %m%n"
   level:
     org.springframework.ai: DEBUG
     com.example.aiscaffold: DEBUG
@@ -112,12 +115,15 @@ resilience4j:
         limit-refresh-period: 1s              # 周期 1 秒
         timeout-duration: 500ms               # 拿不到许可快速失败（交互场景）
 
-# ========== K8s 健康探针（Day75）==========
+# ========== 可观测性：探针（Day75）+ 监控端点（Day78）+ 链路追踪（Day79）==========
 management:
+  tracing:
+    sampling:
+      probability: 1.0    # Demo 全采样；生产 0.1
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus    # Day78: 监控抓取端点
   endpoint:
     health:
       probes:
