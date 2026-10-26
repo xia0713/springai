@@ -15,16 +15,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 成本优化服务（Day72 建，Day78 升级为 Micrometer 指标）。
+ * 成本优化服务（Day72 建，Day78 升级 Micrometer，Day80 管线下沉）。
  * <p>
- * 指标三类型示范（Day78 1.2）：
- * - Counter：cacheHits / 模型调用 / tokensSaved（只增；tokensSaved.increment(N) 记数量）
- * - Gauge：cacheSize（瞬时值，可升可降）
- * - Timer：LLM 耗时分布（publishPercentileHistogram 才能在 Prometheus 算 P95 —— Day78 的坑）
+ * Day80 方案 A：安全管线从 Controller 下沉到服务内核 ——
+ * 所有调用方（网关/直连/未来入口）自动被保护，想绕都绕不过。
+ * 流程：审核拦截 → 入站脱敏 → 缓存(脱敏 key) → 路由调用 → 出站脱敏 → 缓存存脱敏答案。
  * <p>
- * 标签只用有限枚举（model=small/big）—— 高基数红线（question/userId 禁入）。
- * stats() 端点保留：人看 JSON、Prometheus 看端点，两不误。
- * ⚠️ 缓存 key 归一化 + 用户维度红线（Day72）：加入个性化时 key 必须含 userId。
+ * ⚠️ 准确性边界（Day80 讨论结论）：单向脱敏对"知识/咨询/生成"类零影响；
+ * 对"要用真实敏感数据执行操作"的场景（如按手机号查订单）会失效 ——
+ * 生产解法是可逆脱敏（占位符化 + 本地映射表 + 工具执行前还原），记入综合项目。
  */
 @Slf4j
 @Service
@@ -32,14 +31,16 @@ public class CostOptimizedChatService {
 
     private final ChatClient bigModel;    // qwen3.8-27b：复杂问题
     private final ChatClient smallModel;  // deepseek-v4-flash：简单问题
+    private final ContentSafetyService contentSafetyService;
 
     private final Map<String, CachedAnswer> cache = new ConcurrentHashMap<>();
 
-    // ---- Micrometer 指标（Day78）：AtomicLong 全部退役 ----
+    // ---- Micrometer 指标（Day78）----
     private final Counter cacheHitCounter;
     private final Counter smallModelCounter;
     private final Counter bigModelCounter;
     private final Counter tokensSavedCounter;
+    private final Counter blockedCounter;
     private final Timer smallModelTimer;
     private final Timer bigModelTimer;
 
@@ -49,11 +50,12 @@ public class CostOptimizedChatService {
 
     public CostOptimizedChatService(@Qualifier("qwenChatClient") ChatClient bigModel,
                                     @Qualifier("deepseekChatClient") ChatClient smallModel,
+                                    ContentSafetyService contentSafetyService,
                                     MeterRegistry registry) {
         this.bigModel = bigModel;
         this.smallModel = smallModel;
+        this.contentSafetyService = contentSafetyService;
 
-        // Counter：只增累计；tokensSaved.increment(N) 记数量
         this.cacheHitCounter = Counter.builder("ai.chat.cache.hits")
                 .description("缓存命中次数").register(registry);
         this.smallModelCounter = Counter.builder("ai.chat.model.calls")
@@ -62,8 +64,9 @@ public class CostOptimizedChatService {
                 .tag("model", "big").description("大模型调用次数").register(registry);
         this.tokensSavedCounter = Counter.builder("ai.chat.tokens.saved")
                 .description("缓存命中累计节省的 tokens").register(registry);
+        this.blockedCounter = Counter.builder("ai.chat.safety.blocked")
+                .description("内容安全拦截次数").register(registry);
 
-        // Timer：开 percentileHistogram，Prometheus 才能算 P95
         this.smallModelTimer = Timer.builder("ai.chat.llm.duration")
                 .tag("model", "small").description("小模型调用耗时")
                 .publishPercentileHistogram().register(registry);
@@ -71,18 +74,31 @@ public class CostOptimizedChatService {
                 .tag("model", "big").description("大模型调用耗时")
                 .publishPercentileHistogram().register(registry);
 
-        // Gauge：瞬时值（cache 大小可升可降）
         Gauge.builder("ai.chat.cache.size", cache, c -> c.size())
                 .description("当前缓存条目数").register(registry);
     }
 
     /**
-     * 带成本策略的问答：缓存命中 → 0 token；未命中 → 按复杂度路由大小模型（带耗时埋点）。
+     * 带成本+安全策略的问答（Day80 方案 A）：
+     * 拦截 → 入站脱敏 → 缓存(脱敏 key) → 路由调用 → 出站脱敏 → 缓存存脱敏答案。
+     * 拦截时返回 code=403 的响应体，调用方透传即可。
      */
     public Map<String, Object> chat(String question) {
-        String key = normalize(question);
+        // ① Day80 安全管线（服务内核层，保护所有入口）：拦截 → 入站脱敏
+        ContentSafetyService.SafetyResult safety = contentSafetyService.checkInput(question);
+        if (!safety.passed()) {
+            blockedCounter.increment();
+            log.info("[cost] 内容安全拦截（{}），不调 LLM", safety.reason());
+            return Map.of(
+                    "code", 403,
+                    "message", safety.reason(),
+                    "route", "BLOCKED",
+                    "tokens", 0);
+        }
+        String masked = safety.maskedQuestion();   // 之后全程只用脱敏文本
+        String key = normalize(masked);            // 缓存 key 也是脱敏后的
 
-        // ① 精确缓存命中：0 token，不调用任何模型
+        // ② 精确缓存命中：0 token
         CachedAnswer hit = cache.get(key);
         if (hit != null) {
             cacheHitCounter.increment();
@@ -94,8 +110,8 @@ public class CostOptimizedChatService {
                     "tokens", 0);
         }
 
-        // ② 复杂度路由：简单 → 小模型，复杂 → 大模型（Timer 记录 LLM 耗时分布）
-        boolean simple = isSimple(question);
+        // ③ 复杂度路由：简单 → 小模型，复杂 → 大模型
+        boolean simple = isSimple(masked);
         ChatClient client = simple ? smallModel : bigModel;
         Timer timer = simple ? smallModelTimer : bigModelTimer;
         if (simple) {
@@ -105,10 +121,11 @@ public class CostOptimizedChatService {
         }
 
         ChatResponse resp = timer.record(() ->
-                client.prompt().user(question).call().chatResponse());
-        String answer = resp.getResult().getOutput().getText();
+                client.prompt().user(masked).call().chatResponse());   // 发给 LLM 的就是脱敏文本
+        String answer = contentSafetyService.maskOutput(              // 出站脱敏
+                resp.getResult().getOutput().getText());
 
-        // ③ 真实用量计量（已验证 API：ChatResponseMetadata.getUsage()）
+        // ④ 真实用量计量 + 缓存存【脱敏后】的答案（缓存里也没有敏感原文）
         Usage usage = resp.getMetadata().getUsage();
         int totalTokens = usage.getTotalTokens() == null ? 0 : usage.getTotalTokens();
 
@@ -146,10 +163,11 @@ public class CostOptimizedChatService {
                 "smallModelCalls", smallModelCounter.count(),
                 "bigModelCalls", bigModelCounter.count(),
                 "tokensSavedByCache", tokensSavedCounter.count(),
+                "blocked", blockedCounter.count(),
                 "cacheSize", cache.size()
         );
     }
 
-    /** 缓存条目：答案 + 当时消耗的 tokens（命中时记为"省下的"） */
+    /** 缓存条目：脱敏后的答案 + 当时消耗的 tokens */
     private record CachedAnswer(String answer, int totalTokens) {}
 }
