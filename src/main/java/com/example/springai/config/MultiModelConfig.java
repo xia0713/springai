@@ -21,7 +21,7 @@ public class MultiModelConfig {
     private String apiKey;
 
     /**
-     * 豆包模型
+     * 备用模型（DeepSeek：小/快/便宜，简单问题与降级用）
      */
     @Bean
     public ChatClient deepseekChatClient() {
@@ -29,11 +29,11 @@ public class MultiModelConfig {
     }
 
     /**
-     * 通义千问模型（也是OpenAI兼容协议）
+     * 主模型（复杂问题）—— Day76：qwen3.8-27b 平台下架，替换为 glm-5.3-flash
      */
     @Bean
-    public ChatClient qwenChatClient() {
-        return buildChatClient("qwen3.8-27b");
+    public ChatClient primaryChatClient() {
+        return buildChatClient("glm-5.3-flash");
     }
 
     private ChatClient buildChatClient(String model) {

@@ -11,6 +11,8 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class CostOptimizedChatService {
 
-    private final ChatClient bigModel;    // qwen3.8-27b：复杂问题
+    private final ChatClient bigModel;    // glm-5.3-flash：复杂问题（Day80：qwen3.8-27b 下架后替换）
     private final ChatClient smallModel;  // deepseek-v4-flash：简单问题
     private final ContentSafetyService contentSafetyService;
 
@@ -48,7 +50,7 @@ public class CostOptimizedChatService {
             "分析", "总结", "对比", "为什么", "怎么", "如何", "方案", "写一个", "解释", "设计"
     };
 
-    public CostOptimizedChatService(@Qualifier("qwenChatClient") ChatClient bigModel,
+    public CostOptimizedChatService(@Qualifier("primaryChatClient") ChatClient bigModel,
                                     @Qualifier("deepseekChatClient") ChatClient smallModel,
                                     ContentSafetyService contentSafetyService,
                                     MeterRegistry registry) {
@@ -120,20 +122,39 @@ public class CostOptimizedChatService {
             bigModelCounter.increment();
         }
 
-        ChatResponse resp = timer.record(() ->
-                client.prompt().user(masked).call().chatResponse());   // 发给 LLM 的就是脱敏文本
-        String answer = contentSafetyService.maskOutput(              // 出站脱敏
-                resp.getResult().getOutput().getText());
+        // ④ 流式调用 + 服务端聚合（Day80 实战修复）：
+        // GLM-5.3 默认思考模式（实测简单问题 reasoning_tokens=401），非流式长思考连接
+        // 会被中转在 ~20-30s 掐断（IO error）—— 流式保持连接活跃直到生成完成。
+        List<ChatResponse> responses = timer.record(() ->
+                client.prompt().user(masked)
+                        .stream()
+                        .chatResponse()
+                        .collectList()
+                        .block(Duration.ofSeconds(90)));
+        if (responses == null || responses.isEmpty()) {
+            throw new IllegalStateException("LLM 流式响应为空");
+        }
+        StringBuilder sb = new StringBuilder();
+        Usage usage = null;
+        for (ChatResponse r : responses) {
+            if (r.getResult() != null && r.getResult().getOutput() != null
+                    && r.getResult().getOutput().getText() != null) {
+                sb.append(r.getResult().getOutput().getText());   // 思考阶段 content 为空，自然跳过
+            }
+            if (r.getMetadata() != null && r.getMetadata().getUsage() != null) {
+                usage = r.getMetadata().getUsage();               // 最后一个 chunk 携带 usage
+            }
+        }
+        String answer = contentSafetyService.maskOutput(sb.toString());   // 出站脱敏
 
-        // ④ 真实用量计量 + 缓存存【脱敏后】的答案（缓存里也没有敏感原文）
-        Usage usage = resp.getMetadata().getUsage();
-        int totalTokens = usage.getTotalTokens() == null ? 0 : usage.getTotalTokens();
+        // ⑤ 真实用量计量（流式最后一个 chunk 携带 usage）+ 缓存存【脱敏后】的答案
+        int totalTokens = (usage != null && usage.getTotalTokens() != null) ? usage.getTotalTokens() : 0;
 
         cache.put(key, new CachedAnswer(answer, totalTokens));
 
         return Map.of(
                 "answer", answer,
-                "route", simple ? "SMALL(deepseek)" : "BIG(qwen)",
+                "route", simple ? "SMALL(deepseek)" : "BIG(glm)",
                 "tokens", totalTokens
         );
     }

@@ -20,7 +20,7 @@ public class ResilientChatService {
     /** 降级用：近期问答缓存（演示级；Day72 升级成正式缓存策略） */
     private final Map<String, String> answerCache = new ConcurrentHashMap<>();
 
-    public ResilientChatService(@Qualifier("qwenChatClient") ChatClient primary, @Qualifier("deepseekChatClient") ChatClient backup) {
+    public ResilientChatService(@Qualifier("primaryChatClient") ChatClient primary, @Qualifier("deepseekChatClient") ChatClient backup) {
         this.primary = primary;
         this.backup = backup;
     }

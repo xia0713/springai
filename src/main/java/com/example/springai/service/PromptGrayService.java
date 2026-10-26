@@ -38,7 +38,7 @@ public class PromptGrayService {
     /** 分流一致性验证：userId → 最近版本（观测"同一用户是否稳定"） */
     private final Map<String, String> userVersionMap = new ConcurrentHashMap<>();
 
-    public PromptGrayService(@Qualifier("qwenChatClient") ChatClient chatClient,
+    public PromptGrayService(@Qualifier("primaryChatClient") ChatClient chatClient,
                              @Value("${app.prompt-gray.percent}") int percent,
                              @Value("${app.prompt-gray.default-version}") String defaultVersion) {
         this.chatClient = chatClient;

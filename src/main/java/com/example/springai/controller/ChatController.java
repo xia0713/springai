@@ -250,8 +250,8 @@ public class ChatController {
     @Resource(name = "deepseekChatClient")
     private ChatClient deepseekChatClient;
 
-    @Resource(name = "qwenChatClient")
-    private ChatClient qwenClient;
+    @Resource(name = "primaryChatClient")
+    private ChatClient primaryClient;
 
     /**
      * 多厂商切换
@@ -261,8 +261,8 @@ public class ChatController {
                                  @RequestParam(defaultValue = "deepseek") String provider) {
         if ("deepseek".equals(provider)) {
             return deepseekChatClient.prompt().user(message).call().content();
-        } else if ("qwen".equals(provider)) {
-            return qwenClient.prompt().user(message).call().content();
+        } else if ("primary".equals(provider) || "qwen".equals(provider)) {
+            return primaryClient.prompt().user(message).call().content();
         }
         throw new IllegalArgumentException("不支持的模型厂商：" + provider);
     }
